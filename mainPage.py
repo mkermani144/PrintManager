@@ -1,6 +1,14 @@
 from tkinter import *
 from tkinter import ttk
-from mainPageCommands import *
+
+
+def openGetIP(root):
+	t=Toplevel(root)
+	t.title("ورود آی پی")
+	ttk.Label(t,text=':لطفا آی پی سرور را وارد کنید').grid(row=0,column=0,padx=10,pady=10)
+	ip=StringVar()
+	ttk.Entry(t,width=45,textvariable=ip).grid(row=1,column=0,padx=30,pady=10)
+	ttk.Button(t,text='تایید',command= lambda: validateIP(ip)).grid(row=2,column=0,padx=10,pady=10)
 
 
 root=Tk()
@@ -55,4 +63,3 @@ ttk.Button(mainframe,text='افزودن موارد انتخابی').grid(row=3,c
 
 
 root.mainloop()
-
