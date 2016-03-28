@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from mainPageCommands import *
 
 
 root=Tk()
@@ -11,7 +12,7 @@ mainframe=ttk.Frame(root).grid(row=0,column=0,sticky="news")
 connectLF=ttk.Labelframe(mainframe,text='اتصال',width=200,height=50,labelanchor="ne")
 connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky="news")
 connectLF.columnconfigure(0,weight=1)
-ttk.Button(connectLF,text='اتصال').grid(row=0,column=0,sticky="news",padx=(5,0),pady=(0,5))
+ttk.Button(connectLF,text='اتصال',command= lambda: openGetIP(root)).grid(row=0,column=0,sticky="news",padx=(5,0),pady=(0,5))
 ttk.Label(connectLF,text=':اتصال به سرور جدید').grid(row=0,column=1,padx=5,pady=(0,5))
 
 quotaLF=ttk.Labelframe(mainframe,text='سهمیه',width=200,height=350,labelanchor="ne")
