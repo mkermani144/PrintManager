@@ -28,8 +28,8 @@ def validateIP(ip,w,e):
 		t=Toplevel(w)
 		t.grab_set()
 		t.title("خطا")
-		t.columnconfigure(0,minsize="200")
-		t.columnconfigure(1,minsize="200")
+		t.columnconfigure(0,minsize="150")
+		t.columnconfigure(1,minsize="150")
 		ttk.Label(t,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
 		b=ttk.Button(t,text='تلاش مجدد',command= lambda: [close(w,t),e.delete(0,'end'),e.focus()])
 		b.grid(row=1,column=0,padx=10,pady=20,sticky="e")
@@ -40,12 +40,13 @@ def openGetIP():
 	t=Toplevel(root)
 	t.grab_set() # Make parent disabled
 	t.title("ورود آی پی")
-	ttk.Label(t,text=':لطفا آی پی سرور را وارد کنید').grid(row=0,column=0,padx=10,pady=10)
+	ttk.Label(t,text=':لطفا آی پی سرور را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
 	ip=StringVar()
 	e=ttk.Entry(t,width=45,textvariable=ip)
-	e.grid(row=1,column=0,padx=30,pady=10)
+	e.grid(row=1,column=0,columnspan=2,padx=30,pady=10)
 	e.focus()
-	ttk.Button(t,text='تایید',command= lambda: validateIP(ip,t,e)).grid(row=2,column=0,padx=10,pady=10)
+	ttk.Button(t,text='تایید',command= lambda: validateIP(ip,t,e)).grid(row=2,column=0,padx=10,pady=10,sticky="e")
+	ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=2,column=1,padx=10,pady=10,sticky="w")
 
 
 
