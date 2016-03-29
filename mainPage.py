@@ -2,12 +2,16 @@ from tkinter import *
 from tkinter import ttk
 from re import match
 
+def close(*args):
+	for w in filter(lambda w: args.index(w),args):
+		w.destroy()
+	args[0].grab_set()
+
 def validateIP(ip,w):
 	f=re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$',ip.get())
 	if f:
-		w.destroy()
 		t=Toplevel(root)
-		t.grab_set()
+		close(t,w)
 		t.title("ورود کاربر")
 		ttk.Label(t,text=':نام کاربری و رمز عبور را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
 		username=StringVar()
@@ -20,7 +24,17 @@ def validateIP(ip,w):
 		e2.grid(row=2,column=0,padx=(10,30),pady=10)
 		ttk.Button(t,text='تایید').grid(row=3,column=0,columnspan=2,padx=10,pady=10,sticky="n")
 		e1.focus()
-
+	else:
+		t=Toplevel(w)
+		t.grab_set()
+		t.title("خطا")
+		t.columnconfigure(0,minsize="200")
+		t.columnconfigure(1,minsize="200")
+		ttk.Label(t,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
+		b=ttk.Button(t,text='تلاش مجدد',command= lambda: close(w,t))
+		b.grid(row=1,column=0,padx=10,pady=20,sticky="e")
+		ttk.Button(t,text='لغو',command= lambda: close(root,w,t)).grid(row=1,column=1,padx=10,pady=20,sticky="w")
+		b.focus()
 
 def openGetIP():
 	t=Toplevel(root)
