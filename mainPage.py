@@ -1,14 +1,38 @@
 from tkinter import *
 from tkinter import ttk
+from re import match
+
+def validateIP(ip,w):
+	f=re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$',ip.get())
+	if f:
+		w.destroy()
+		t=Toplevel(root)
+		t.grab_set()
+		t.title("ورود کاربر")
+		ttk.Label(t,text=':نام کاربری و رمز عبور را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
+		username=StringVar()
+		password=StringVar()
+		ttk.Label(t,text=':نام کاربری').grid(row=1,column=1,padx=(0,10),pady=10,sticky="e")
+		ttk.Label(t,text=':رمز عبور').grid(row=2,column=1,padx=(0,10),pady=10,sticky="e")
+		e1=ttk.Entry(t,width=45,textvariable=username)
+		e1.grid(row=1,column=0,padx=(10,30),pady=10)
+		e2=ttk.Entry(t,width=45,textvariable=password,show="\u2022") # \u2022 is bullet character
+		e2.grid(row=2,column=0,padx=(10,30),pady=10)
+		ttk.Button(t,text='تایید').grid(row=3,column=0,columnspan=2,padx=10,pady=10,sticky="n")
+		e1.focus()
 
 
-def openGetIP(root):
+def openGetIP():
 	t=Toplevel(root)
+	t.grab_set() # Make parent disabled
 	t.title("ورود آی پی")
 	ttk.Label(t,text=':لطفا آی پی سرور را وارد کنید').grid(row=0,column=0,padx=10,pady=10)
 	ip=StringVar()
-	ttk.Entry(t,width=45,textvariable=ip).grid(row=1,column=0,padx=30,pady=10)
-	ttk.Button(t,text='تایید',command= lambda: validateIP(ip)).grid(row=2,column=0,padx=10,pady=10)
+	e=ttk.Entry(t,width=45,textvariable=ip)
+	e.grid(row=1,column=0,padx=30,pady=10)
+	e.focus()
+	ttk.Button(t,text='تایید',command= lambda: validateIP(ip,t)).grid(row=2,column=0,padx=10,pady=10)
+
 
 
 root=Tk()
@@ -20,7 +44,7 @@ mainframe=ttk.Frame(root).grid(row=0,column=0,sticky="news")
 connectLF=ttk.Labelframe(mainframe,text='اتصال',width=200,height=50,labelanchor="ne")
 connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky="news")
 connectLF.columnconfigure(0,weight=1)
-ttk.Button(connectLF,text='اتصال',command= lambda: openGetIP(root)).grid(row=0,column=0,sticky="news",padx=(5,0),pady=(0,5))
+ttk.Button(connectLF,text='اتصال',command=openGetIP ).grid(row=0,column=0,sticky="news",padx=(5,0),pady=(0,5))
 ttk.Label(connectLF,text=':اتصال به سرور جدید').grid(row=0,column=1,padx=5,pady=(0,5))
 
 quotaLF=ttk.Labelframe(mainframe,text='سهمیه',width=200,height=350,labelanchor="ne")
