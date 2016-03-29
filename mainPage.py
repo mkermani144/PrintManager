@@ -5,13 +5,15 @@ from re import match
 def close(*args):
 	for w in filter(lambda w: args.index(w),args):
 		w.destroy()
-	args[0].grab_set()
+	args[0].focus()
 
-def validateIP(ip,w,e):
-	f=re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$',ip.get())
-	if f:
+def validateIP(ip):
+	return re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$',ip.get())
+
+def userPass(ip,w,e):
+	if validateIP(ip):
 		t=Toplevel(root)
-		close(t,w)
+		t.grab_set()
 		t.title("ورود کاربر")
 		ttk.Label(t,text=':نام کاربری و رمز عبور را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
 		username=StringVar()
@@ -33,10 +35,10 @@ def validateIP(ip,w,e):
 		ttk.Label(t,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
 		b=ttk.Button(t,text='تلاش مجدد',command= lambda: [close(w,t),e.delete(0,'end'),e.focus()])
 		b.grid(row=1,column=0,padx=10,pady=(10,10),sticky="e")
-		ttk.Button(t,text='لغو',command= lambda: close(root,w,t)).grid(row=1,column=1,padx=10,pady=(10,10),sticky="w")
+		ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=1,column=1,padx=10,pady=(10,10),sticky="w")
 		b.focus()
 
-def openGetIP():
+def setDefaultIP():
 	t=Toplevel(root)
 	t.grab_set() # Make parent disabled
 	t.title("ورود آی پی")
@@ -48,7 +50,13 @@ def openGetIP():
 	ttk.Button(t,text='تایید',command= lambda: validateIP(ip,t,e)).grid(row=2,column=0,padx=10,pady=10,sticky="e")
 	ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=2,column=1,padx=10,pady=10,sticky="w")
 
-
+def enableEntry(rbv,entry,ip):
+	if rbv.get()=='new':
+		entry.config(state='enabled')
+		ip.set('')
+	else:
+		entry.config(state='disabled')
+		ip.set('127.0.0.1')
 
 root=Tk()
 root.title('نرم افزار مدیریت پرینت - مرکز فناوری اطلاعات - دانشگاه صنعتی اصفهان')
@@ -59,8 +67,17 @@ mainframe=ttk.Frame(root).grid(row=0,column=0,sticky="news")
 connectLF=ttk.Labelframe(mainframe,text='اتصال',width=200,height=50,labelanchor="ne")
 connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky="news")
 connectLF.columnconfigure(0,weight=1)
-ttk.Button(connectLF,text='اتصال',command=openGetIP ).grid(row=0,column=0,sticky="news",padx=(5,0),pady=(0,5))
-ttk.Label(connectLF,text=':اتصال به سرور جدید').grid(row=0,column=1,padx=5,pady=(0,5))
+ttk.Label(connectLF,text=':نوع اتصال به سرور').grid(row=0,column=0,columnspan=2,padx=5,pady=(0,5),sticky="e")
+v=StringVar()
+ip=StringVar()
+ttk.Radiobutton(connectLF,variable=v,value='new',command= lambda: enableEntry(v,e,ip)).grid(row=1,column=1,sticky="e")
+ttk.Radiobutton(connectLF,variable=v,value='default',command= lambda: enableEntry(v,e,ip)).grid(row=2,column=1,sticky="e")
+ttk.Label(connectLF,text='اتصال به سرور جدید').grid(row=1,padx=5,pady=(0,5),sticky="e")
+ttk.Label(connectLF,text='اتصال به سرور پیش فرض').grid(row=2,padx=5,pady=(0,5),sticky="e")
+e=ttk.Entry(connectLF,textvariable=ip)
+e.grid(row=3,sticky="we",padx=(5,50),pady=5)
+ttk.Label(connectLF,text=':آی پی سرور').grid(row=3,column=0,columnspan=2,padx=5,pady=(0,5),sticky="e")
+ttk.Button(connectLF,text='اتصال',command= lambda: userPass(ip,root,e) ).grid(row=4,column=0,columnspan=2,sticky="news",padx=5,pady=5)
 
 quotaLF=ttk.Labelframe(mainframe,text='سهمیه',width=200,height=350,labelanchor="ne")
 quotaLF.grid(row=2,column=1,padx=(0,5),pady=5,sticky="news")
