@@ -1,10 +1,12 @@
 from tkinter import *
 from tkinter import ttk
 from re import match
+from ldap3 import *
 
 def close(*args):
 	for w in filter(lambda w: args.index(w),args):
 		w.destroy()
+	args[0].grab_set()
 	args[0].focus()
 
 def validateIP(ip):
@@ -38,8 +40,26 @@ def userPass(ip,w,e):
 		ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=1,column=1,padx=10,pady=(10,10),sticky="w")
 		b.focus()
 
+def connect(ip,username,password):
+	server=Server(ip.get()) # use_ssl=False
+	connection=Connection(server,username,get(),password.get(),read_only=True)
+	if connection.bind():
+		connection.search(search_base='ou=iut,ou=ac,ou=ir',
+			search_filter='(objectClass=inetOrgPerson'),
+			search_scope=SUBTREE,
+			attributes=['cn'])
+		# for entry in c.response:
+		#	 print(entry['attributes'])
+
+	else:
+		t=Toplevel(root)
+		t.grab_set()
+		t.title("خطا")
+		t.columnconfigure(0,minsize="150")
+		ttk.Label(t,text='.امکان برقراری ارتباط با سرور وجود ندارد').grid(row=0,column=0,padx=50,pady=20)
+		ttk.Button(t,text='بازگشت',command= lambda: close(root,t)).grid(row=1,column=0,padx=10,pady=(10,10))
+
 def setDefaultIP(configurations,w):
-	print('hello')
 	def setDefaultIPInner():
 		if validateIP(ip):
 			configurations[0]=ip.get()
@@ -141,10 +161,6 @@ tree.grid(row=0,column=0,pady=(5,0),sticky="news")
 s=ttk.Scrollbar(treeLF,orient=VERTICAL,command=tree.yview)
 s.grid(row=0,column=1,pady=(5,0),sticky="ns")
 tree.configure(yscrollcommand=s.set)
-# tree.heading('#0', text='Name',anchor="w")
-# tree.insert('',0,'mother',text='hello',open=True)
-# tree.insert('mother',2,text='hello2')
-# tree.insert('mother',1,text='hello3')
 
 ttk.Button(mainframe,text='افزودن موارد انتخابی').grid(row=3,column=1,sticky="news",padx=(0,5),pady=(0,5))
 
