@@ -26,7 +26,7 @@ def userPass(ip,w,e):
 		e1.grid(row=1,column=0,padx=(10,30),pady=10)
 		e2=ttk.Entry(t,width=45,textvariable=password,show="\u2022") # \u2022 is bullet character
 		e2.grid(row=2,column=0,padx=(10,30),pady=10)
-		ttk.Button(t,text='تایید').grid(row=3,column=0,columnspan=2,padx=10,pady=10,sticky="n")
+		ttk.Button(t,text='تایید',command= lambda: connect(ip,username,password,t)).grid(row=3,column=0,columnspan=2,padx=10,pady=10,sticky="n")
 		e1.focus()
 	else:
 		t=Toplevel(w)
@@ -40,18 +40,19 @@ def userPass(ip,w,e):
 		ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=1,column=1,padx=10,pady=(10,10),sticky="w")
 		b.focus()
 
-def connect(ip,username,password):
+def connect(ip,username,password,w):
+	w.destroy()
 	server=Server(ip.get()) # use_ssl=False
-	connection=Connection(server,username,get(),password.get(),read_only=True)
-	if connection.bind():
+	connection=Connection(server,username.get(),password.get(),read_only=True)
+	try:
+		connection.bind()
 		connection.search(search_base='ou=iut,ou=ac,ou=ir',
-			search_filter='(objectClass=inetOrgPerson'),
+			search_filter='(objectClass)=inetOrgPerson',
 			search_scope=SUBTREE,
 			attributes=['cn'])
 		# for entry in c.response:
 		#	 print(entry['attributes'])
-
-	else:
+	except:
 		t=Toplevel(root)
 		t.grab_set()
 		t.title("خطا")
@@ -121,6 +122,7 @@ connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky="news")
 connectLF.columnconfigure(0,weight=1)
 ttk.Label(connectLF,text=':نوع اتصال به سرور').grid(row=0,column=0,columnspan=2,padx=5,pady=(0,5),sticky="e")
 v=StringVar()
+v.set('default')
 ip=StringVar()
 ttk.Radiobutton(connectLF,variable=v,value='new',command= lambda: toggleEntry(v,e,ip)).grid(row=1,column=1,sticky="e")
 ttk.Radiobutton(connectLF,variable=v,value='default',command= lambda: toggleEntry(v,e,ip)).grid(row=2,column=1,sticky="e")
@@ -128,6 +130,7 @@ ttk.Label(connectLF,text='اتصال به سرور جدید').grid(row=1,padx=5,
 ttk.Label(connectLF,text='اتصال به سرور پیش فرض').grid(row=2,padx=5,pady=(0,5),sticky="e")
 e=ttk.Entry(connectLF,textvariable=ip)
 e.grid(row=3,sticky="we",padx=(5,50),pady=5)
+toggleEntry(v,e,ip)
 ttk.Label(connectLF,text=':آی پی سرور').grid(row=3,column=0,columnspan=2,padx=5,pady=(0,5),sticky="e")
 ttk.Button(connectLF,text='اتصال',command= lambda: userPass(ip,root,e) ).grid(row=4,column=0,columnspan=2,sticky="news",padx=5,pady=5)
 
@@ -166,7 +169,6 @@ ttk.Button(mainframe,text='افزودن موارد انتخابی').grid(row=3,c
 
 with open('conf') as f:
 	configurations=f.readlines()
-	print(configurations[1])
 	configurations[0]=configurations[0].strip()
 	configurations[1]=configurations[1].strip()
 	if(configurations[1]=='1'):
