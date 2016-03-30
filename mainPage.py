@@ -56,7 +56,8 @@ def enableEntry(rbv,entry,ip):
 		ip.set('')
 	else:
 		entry.config(state='disabled')
-		ip.set('127.0.0.1')
+		with open('conf') as f:
+			ip.set(f.readlines()[0])
 
 root=Tk()
 root.title('نرم افزار مدیریت پرینت - مرکز فناوری اطلاعات - دانشگاه صنعتی اصفهان')
