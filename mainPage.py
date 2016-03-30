@@ -88,20 +88,6 @@ root.resizable(False,False)
 
 mainframe=ttk.Frame(root).grid(row=0,column=0,sticky="news")
 
-with open('conf') as f:
-	configurations=f.readlines()
-	if(configurations[1]):
-		configurations[1]='0'
-		updateConf(configurations)
-		t=Toplevel(root)
-		t.grab_set()
-		t.title('تغییر آی پی سرور پیش فرض')
-		ttk.Label(t,text='آی پی سرور پیش فرض 127.0.0.1 تنظیم شده است. آیا می خواهید آن را تغییر دهید؟').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
-		ttk.Button(t,text='بله',command= lambda: setDefaultIP(configurations,t)).grid(row=2,column=0,padx=10,pady=10,sticky="e")
-		ttk.Button(t,text='خیر',command= lambda: close(root,t)).grid(row=2,column=1,padx=10,pady=10,sticky="w")
-
-
-
 connectLF=ttk.Labelframe(mainframe,text='اتصال',width=200,height=50,labelanchor="ne")
 connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky="news")
 connectLF.columnconfigure(0,weight=1)
@@ -154,6 +140,21 @@ tree.configure(yscrollcommand=s.set)
 
 ttk.Button(mainframe,text='افزودن موارد انتخابی').grid(row=3,column=1,sticky="news",padx=(0,5),pady=(0,5))
 
+with open('conf') as f:
+	configurations=f.readlines()
+	print(configurations[1])
+	configurations[0]=configurations[0].strip()
+	configurations[1]=configurations[1].strip()
+	if(configurations[1]=='1'):
+		configurations[1]='0'
+		updateConf(configurations)
+		t=Toplevel(root)
+		t.grab_set()
+		t.focus()
+		t.title('تغییر آی پی سرور پیش فرض')
+		ttk.Label(t,text='آی پی سرور پیش فرض 127.0.0.1 تنظیم شده است. آیا می خواهید آن را تغییر دهید؟').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
+		ttk.Button(t,text='بله',command= lambda: setDefaultIP(configurations,t)).grid(row=2,column=0,padx=10,pady=10,sticky="e")
+		ttk.Button(t,text='خیر',command= lambda: close(root,t)).grid(row=2,column=1,padx=10,pady=10,sticky="w")
 
 
 root.mainloop()
