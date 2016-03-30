@@ -44,7 +44,15 @@ def setDefaultIP(configurations,w):
 		if validateIP(ip):
 			configurations[0]=ip.get()
 			updateConf(configurations)
-			close(root,t)
+			t1=Toplevel(root)
+			t1.grab_set()
+			t1.title('عملیات موفقیت آمیز')
+			t1.columnconfigure(0,minsize="150")
+			ttk.Label(t1,text='.آی پی سرور پیش فرض با موفقیت تغییر یافت').grid(row=0,column=0,padx=50,pady=20)
+			b=ttk.Button(t1,text='تایید',command= lambda: [close(root,t1)])
+			b.grid(row=1,column=0,padx=10,pady=(10,10))
+			b.focus()
+			close(t1,t)
 		else:
 			t1=Toplevel(t)
 			t1.grab_set()
@@ -68,7 +76,7 @@ def setDefaultIP(configurations,w):
 	ttk.Button(t,text='تایید',command= setDefaultIPInner).grid(row=2,column=0,padx=10,pady=10,sticky="e")
 	ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=2,column=1,padx=10,pady=10,sticky="w")
 
-def enableEntry(rbv,entry,ip):
+def toggleEntry(rbv,entry,ip):
 	if rbv.get()=='new':
 		entry.config(state='enabled')
 		ip.set('')
@@ -94,8 +102,8 @@ connectLF.columnconfigure(0,weight=1)
 ttk.Label(connectLF,text=':نوع اتصال به سرور').grid(row=0,column=0,columnspan=2,padx=5,pady=(0,5),sticky="e")
 v=StringVar()
 ip=StringVar()
-ttk.Radiobutton(connectLF,variable=v,value='new',command= lambda: enableEntry(v,e,ip)).grid(row=1,column=1,sticky="e")
-ttk.Radiobutton(connectLF,variable=v,value='default',command= lambda: enableEntry(v,e,ip)).grid(row=2,column=1,sticky="e")
+ttk.Radiobutton(connectLF,variable=v,value='new',command= lambda: toggleEntry(v,e,ip)).grid(row=1,column=1,sticky="e")
+ttk.Radiobutton(connectLF,variable=v,value='default',command= lambda: toggleEntry(v,e,ip)).grid(row=2,column=1,sticky="e")
 ttk.Label(connectLF,text='اتصال به سرور جدید').grid(row=1,padx=5,pady=(0,5),sticky="e")
 ttk.Label(connectLF,text='اتصال به سرور پیش فرض').grid(row=2,padx=5,pady=(0,5),sticky="e")
 e=ttk.Entry(connectLF,textvariable=ip)
