@@ -38,16 +38,34 @@ def userPass(ip,w,e):
 		ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=1,column=1,padx=10,pady=(10,10),sticky="w")
 		b.focus()
 
-def setDefaultIP():
+def setDefaultIP(configurations,w):
+	print('hello')
+	def setDefaultIPInner():
+		if validateIP(ip):
+			configurations[0]=ip.get()
+			updateConf(configurations)
+			close(root,t)
+		else:
+			t1=Toplevel(t)
+			t1.grab_set()
+			t1.title("خطا")
+			t1.columnconfigure(0,minsize="150")
+			t1.columnconfigure(1,minsize="150")
+			ttk.Label(t1,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
+			b=ttk.Button(t1,text='تلاش مجدد',command= lambda: [close(t,t1),e.delete(0,'end'),e.focus()])
+			b.grid(row=1,column=0,padx=10,pady=(10,10),sticky="e")
+			ttk.Button(t1,text='لغو',command= lambda: close(root,t1,t)).grid(row=1,column=1,padx=10,pady=(10,10),sticky="w")
+			b.focus()
+	close(root,w)
 	t=Toplevel(root)
 	t.grab_set() # Make parent disabled
-	t.title("ورود آی پی")
-	ttk.Label(t,text=':لطفا آی پی سرور را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
+	t.title("ورود آی پی سرور پیش فرض")
+	ttk.Label(t,text=':لطفا آی پی سرور پیش فرض را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
 	ip=StringVar()
 	e=ttk.Entry(t,width=45,textvariable=ip)
 	e.grid(row=1,column=0,columnspan=2,padx=30,pady=10)
 	e.focus()
-	ttk.Button(t,text='تایید',command= lambda: validateIP(ip,t,e)).grid(row=2,column=0,padx=10,pady=10,sticky="e")
+	ttk.Button(t,text='تایید',command= setDefaultIPInner).grid(row=2,column=0,padx=10,pady=10,sticky="e")
 	ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=2,column=1,padx=10,pady=10,sticky="w")
 
 def enableEntry(rbv,entry,ip):
@@ -59,11 +77,30 @@ def enableEntry(rbv,entry,ip):
 		with open('conf') as f:
 			ip.set(f.readlines()[0])
 
+def updateConf(configurations):
+	with open('conf','w') as f:
+		for item in configurations:
+			f.write(item+'\n')
+
 root=Tk()
 root.title('نرم افزار مدیریت پرینت - مرکز فناوری اطلاعات - دانشگاه صنعتی اصفهان')
 root.resizable(False,False)
 
 mainframe=ttk.Frame(root).grid(row=0,column=0,sticky="news")
+
+with open('conf') as f:
+	configurations=f.readlines()
+	if(configurations[1]):
+		configurations[1]='0'
+		updateConf(configurations)
+		t=Toplevel(root)
+		t.grab_set()
+		t.title('تغییر آی پی سرور پیش فرض')
+		ttk.Label(t,text='آی پی سرور پیش فرض 127.0.0.1 تنظیم شده است. آیا می خواهید آن را تغییر دهید؟').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
+		ttk.Button(t,text='بله',command= lambda: setDefaultIP(configurations,t)).grid(row=2,column=0,padx=10,pady=10,sticky="e")
+		ttk.Button(t,text='خیر',command= lambda: close(root,t)).grid(row=2,column=1,padx=10,pady=10,sticky="w")
+
+
 
 connectLF=ttk.Labelframe(mainframe,text='اتصال',width=200,height=50,labelanchor="ne")
 connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky="news")
