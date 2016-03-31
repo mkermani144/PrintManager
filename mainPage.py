@@ -46,12 +46,22 @@ def connect(ip,username,password,w):
 	connection=Connection(server,username.get(),password.get(),read_only=True)
 	try:
 		connection.bind()
-		connection.search(search_base='ou=iut,ou=ac,ou=ir',
+		connection.search(search_base='',
+			search_filter='(objectClass)=organizationalUnit',
+			search_scope=SUBTREE,
+			attributes=['DN'])
+		for entry in c.entries:
+			dn=entry['DN']
+			tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1])
+
+		connection.search(search_base='',
 			search_filter='(objectClass)=inetOrgPerson',
 			search_scope=SUBTREE,
-			attributes=['cn'])
-		# for entry in c.response:
-		#	 print(entry['attributes'])
+			attributes=['cn','sn','studentNumber','DN'])
+		for entry in c.entries:
+			dn=entry['DN']
+			tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1])
+
 	except:
 		t=Toplevel(root)
 		t.grab_set()
