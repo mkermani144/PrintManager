@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from re import match
 from ldap3 import *
-import pyodbc
+# import pyodbc
 
 def close(*args):
 	for w in filter(lambda w: args.index(w),args):
@@ -27,7 +27,9 @@ def userPass(ip,w,e):
 		e1.grid(row=1,column=0,padx=(10,30),pady=10)
 		e2=ttk.Entry(t,width=45,textvariable=password,show='\u2022') # \u2022 is bullet character
 		e2.grid(row=2,column=0,padx=(10,30),pady=10)
-		ttk.Button(t,text='تایید',command= lambda: connect(ip,username,password,t)).grid(row=3,column=0,columnspan=2,padx=10,pady=10,sticky='n')
+		myButton=ttk.Button(t,text='تایید',command= lambda: connect(ip,username,password,t))
+		myButton.grid(row=3,column=0,columnspan=2,padx=10,pady=10,sticky='n')
+		myButton.bind('<Return>',lambda ev: connect(ip,username,password,t))
 		e1.focus()
 	else:
 		t=Toplevel(w)
@@ -38,7 +40,10 @@ def userPass(ip,w,e):
 		ttk.Label(t,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
 		b=ttk.Button(t,text='تلاش مجدد',command= lambda: [close(w,t),e.delete(0,'end'),e.focus()])
 		b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
-		ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
+		b.bind('<Return>',lambda ev: [close(w,t),e.delete(0,'end')])
+		b2=ttk.Button(t,text='لغو',command= lambda: close(root,t))
+		b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
+		b2.bind('<Return>',lambda ev: close(root,t))
 		b.focus()
 
 def connect(ip,username,password,w):
@@ -69,7 +74,9 @@ def connect(ip,username,password,w):
 		t.title('خطا')
 		t.columnconfigure(0,minsize='150')
 		ttk.Label(t,text='.امکان برقراری ارتباط با سرور وجود ندارد').grid(row=0,column=0,padx=50,pady=20)
-		ttk.Button(t,text='بازگشت',command= lambda: close(root,t)).grid(row=1,column=0,padx=10,pady=(10,10))
+		myButton=ttk.Button(t,text='بازگشت',command= lambda: close(root,t))
+		myButton.grid(row=1,column=0,padx=10,pady=(10,10))
+		myButton.bind('<Return>',lambda ev: close(root,t))
 
 def setDefaultIP(configurations,w):
 	def setDefaultIPInner():
@@ -81,8 +88,9 @@ def setDefaultIP(configurations,w):
 			t1.title('عملیات موفقیت آمیز')
 			t1.columnconfigure(0,minsize='150')
 			ttk.Label(t1,text='.آی پی سرور پیش فرض با موفقیت تغییر یافت').grid(row=0,column=0,padx=50,pady=20)
-			b=ttk.Button(t1,text='تایید',command= lambda: [close(root,t1)])
+			b=ttk.Button(t1,text='تایید',command= lambda: close(root,t1))
 			b.grid(row=1,column=0,padx=10,pady=(10,10))
+			b.bind('<Return>',lambda ev: close(root,t1))
 			b.focus()
 			close(t1,t)
 		else:
@@ -94,7 +102,10 @@ def setDefaultIP(configurations,w):
 			ttk.Label(t1,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
 			b=ttk.Button(t1,text='تلاش مجدد',command= lambda: [close(t,t1),e.delete(0,'end'),e.focus()])
 			b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
-			ttk.Button(t1,text='لغو',command= lambda: close(root,t1,t)).grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
+			b.bind('<Return>',lambda ev: [close(t,t1),e.delete(0,'end'),e.focus()])
+			b2=ttk.Button(t1,text='لغو',command= lambda: close(root,t1,t))
+			b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
+			b2.bind('<Return>',lambda ev: close(root,t1,t))
 			b.focus()
 	close(root,w)
 	t=Toplevel(root)
@@ -105,8 +116,12 @@ def setDefaultIP(configurations,w):
 	e=ttk.Entry(t,width=45,textvariable=ip)
 	e.grid(row=1,column=0,columnspan=2,padx=30,pady=10)
 	e.focus()
-	ttk.Button(t,text='تایید',command= setDefaultIPInner).grid(row=2,column=0,padx=10,pady=10,sticky='e')
-	ttk.Button(t,text='لغو',command= lambda: close(root,t)).grid(row=2,column=1,padx=10,pady=10,sticky='w')
+	b=ttk.Button(t,text='تایید',command= setDefaultIPInner)
+	b.grid(row=2,column=0,padx=10,pady=10,sticky='e')
+	b.bind('<Return>',setDefaultIPInner(e))
+	b2=ttk.Button(t,text='لغو',command= lambda: close(root,t))
+	b2.grid(row=2,column=1,padx=10,pady=10,sticky='w')
+	b2.bind('<Return>',lambda ev: close(root,t))
 
 def toggleEntry(rbv,entry,ip):
 	if rbv.get()=='new':
@@ -128,7 +143,7 @@ def toggleColor(flag):
 	state=(('hasFocus','hasBlur'),('hasBlur','hasFocus'))[flag]
 	tree.item(current,tags=[w.replace(state[0],state[1]) for w in tree.item(current)['tags']])
 
-def addToDB():
+def addToDB(e):
 	MDB = 'db.mdb'
 	DRV = '{Microsoft Access Driver (*.mdb)}'
 	# PWD = 'mypassword'
@@ -169,7 +184,9 @@ e=ttk.Entry(connectLF,textvariable=ip)
 e.grid(row=3,sticky='we',padx=(5,50),pady=5)
 toggleEntry(v,e,ip)
 ttk.Label(connectLF,text=':آی پی سرور').grid(row=3,column=0,columnspan=2,padx=5,pady=(0,5),sticky='e')
-ttk.Button(connectLF,text='اتصال',command= lambda: userPass(ip,root,e) ).grid(row=4,column=0,columnspan=2,sticky='news',padx=5,pady=5)
+b=ttk.Button(connectLF,text='اتصال',command= lambda: userPass(ip,root,e) )
+b.grid(row=4,column=0,columnspan=2,sticky='news',padx=5,pady=5)
+b.bind('<Return>',lambda ev: userPass(ip,root,e))
 
 quotaLF=ttk.Labelframe(mainframe,text='سهمیه',width=200,height=350,labelanchor='ne')
 quotaLF.grid(row=2,column=1,padx=(0,5),pady=5,sticky='news')
@@ -209,8 +226,12 @@ s.grid(row=0,column=2,pady=(5,0),sticky='ns')
 tree.configure(yscrollcommand=s.set)
 tree.tag_configure('hasFocus',background='green')
 tree.tag_configure('hasBlur',background='white')
-ttk.Button(treeLF,text='انتخاب',command= lambda: toggleColor(1)).grid(row=1,column=0,sticky='news',padx=5,pady=5)
-ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0)).grid(row=1,column=1,sticky='news',padx=5,pady=5)
+b=ttk.Button(treeLF,text='انتخاب',command= lambda: toggleColor(1))
+b.grid(row=1,column=0,sticky='news',padx=5,pady=5)
+b.bind('<Return>',lambda ev: toggleColor(1))
+b2=ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0))
+b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
+b2.bind('<Return>',lambda ev: toggleColor(0))
 
 # tree.insert('', 'end', text='button', tags=('hasBlur', 'simple'))
 # tree.insert('', 'end', text='button2', tags=( 'hasBlur','simple'))
@@ -221,7 +242,9 @@ ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0)).gr
 # tree.insert('', 'end', text='but34534534534ton', tags=('hasBlur', 'simple'))
 # tree.insert('', 'end', text='but345345345345345345ton', tags=( 'hasBlur','simple'))
 
-ttk.Button(mainframe,text='افزودن موارد انتخابی',command=addToDB).grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
+addB=ttk.Button(mainframe,text='افزودن موارد انتخابی',command=addToDB)
+addB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
+addB.bind('<Return>',addToDB)
 
 with open('conf') as f:
 	configurations=f.readlines()
@@ -235,8 +258,12 @@ with open('conf') as f:
 		t.focus()
 		t.title('تغییر آی پی سرور پیش فرض')
 		ttk.Label(t,text='آی پی سرور پیش فرض 127.0.0.1 تنظیم شده است. آیا می خواهید آن را تغییر دهید؟').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
-		ttk.Button(t,text='بله',command= lambda: setDefaultIP(configurations,t)).grid(row=2,column=0,padx=10,pady=10,sticky='e')
-		ttk.Button(t,text='خیر',command= lambda: close(root,t)).grid(row=2,column=1,padx=10,pady=10,sticky='w')
+		y=ttk.Button(t,text='بله',command= lambda: setDefaultIP(configurations,t))
+		y.grid(row=2,column=0,padx=10,pady=10,sticky='e')
+		y.bind('<Return>',lambda ev: setDefaultIP(configurations,t))
+		n=ttk.Button(t,text='خیر',command= lambda: close(root,t))
+		n.grid(row=2,column=1,padx=10,pady=10,sticky='w')
+		n.bind('<Return>',lambda ev: close(root,t))
 
 
 root.mainloop()
