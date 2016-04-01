@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from re import match
 from ldap3 import *
-# import pyodbc
+import pyodbc
 
 def close(*args):
 	for w in filter(lambda w: args.index(w),args):
