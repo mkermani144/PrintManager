@@ -52,7 +52,7 @@ def connect(ip,username,password,w):
 			attributes=['DN'])
 		for entry in c.entries:
 			dn=entry['DN']
-			tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1])
+			tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='hasBlur')
 
 		connection.search(search_base='',
 			search_filter='(objectClass)=inetOrgPerson',
@@ -60,7 +60,7 @@ def connect(ip,username,password,w):
 			attributes=['cn','sn','studentNumber','DN'])
 		for entry in c.entries:
 			dn=entry['DN']
-			tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1])
+			tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='hasBlur')
 
 	except:
 		t=Toplevel(root)
@@ -121,6 +121,11 @@ def updateConf(configurations):
 		for item in configurations:
 			f.write(item+'\n')
 
+def toggleColor(flag):
+	current=tree.focus()
+	state=(('hasFocus','hasBlur'),('hasBlur','hasFocus'))[flag]
+	tree.item(current,tags=[w.replace(state[0],state[1]) for w in tree.item(current)['tags']])
+
 root=Tk()
 root.title('نرم افزار مدیریت پرینت - مرکز فناوری اطلاعات - دانشگاه صنعتی اصفهان')
 root.resizable(False,False)
@@ -169,11 +174,18 @@ ttk.Label(quotaLF,text=':تخفیف').grid(row=5,column=2,padx=5,pady=(5,10),sti
 treeLF=ttk.Labelframe(mainframe,text='نتیجه ی جستجو',labelanchor="ne")
 treeLF.grid(row=0,column=0,rowspan=3,padx=5,pady=5,sticky="news")
 treeLF.rowconfigure(0,weight=1)
-tree=ttk.Treeview(treeLF,)
-tree.grid(row=0,column=0,pady=(5,0),sticky="news")
+tree=ttk.Treeview(treeLF)
+tree.grid(row=0,column=0,columnspan=2,pady=(5,0),sticky="nws")
 s=ttk.Scrollbar(treeLF,orient=VERTICAL,command=tree.yview)
-s.grid(row=0,column=1,pady=(5,0),sticky="ns")
+s.grid(row=0,column=2,pady=(5,0),sticky="ns")
 tree.configure(yscrollcommand=s.set)
+tree.tag_configure('hasFocus',background='green')
+tree.tag_configure('hasBlur',background='white')
+ttk.Button(treeLF,text='انتخاب',command= lambda: toggleColor(1)).grid(row=1,column=0,sticky="news",padx=5,pady=5)
+ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0)).grid(row=1,column=1,sticky="news",padx=5,pady=5)
+
+# tree.insert('', 'end', text='button', tags=('hasFocus', 'simple'))
+# tree.insert('', 'end', text='button', tags=( 'hasBlur','simple'))
 
 ttk.Button(mainframe,text='افزودن موارد انتخابی').grid(row=3,column=1,sticky="news",padx=(0,5),pady=(0,5))
 
