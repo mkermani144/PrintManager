@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from re import match
 from ldap3 import *
-import pyodbc
+# import pyodbc
 
 def close(*args):
 	for w in filter(lambda w: args.index(w),args):
@@ -49,34 +49,37 @@ def userPass(ip,w,e):
 def connect(ip,username,password,w):
 	w.destroy()
 	server=Server(ip.get()) # use_ssl=False
+	print(ip.get())
 	connection=Connection(server,username.get(),password.get(),read_only=True)
-	try:
-		connection.bind()
-		connection.search(search_base='',
-			search_filter='(objectClass)=organizationalUnit',
-			search_scope=SUBTREE,
-			attributes=['DN'])
-		for entry in c.entries:
-			dn=entry['DN']
-			tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='hasBlur')
 
-		connection.search(search_base='',
-			search_filter='(objectClass)=inetOrgPerson',
-			search_scope=SUBTREE,
-			attributes=['cn','sn','studentNumber','DN'])
-		for entry in c.entries:
-			dn=entry['DN']
-			tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='hasBlur')
+	connection.bind()
+	print(connection.result)
+	tree.insert('',0,text='salon.iut',iid='DC=salon,DC=iut',tags='hasBlur')
+	connection.search(search_base='dc=salon,dc=iut',
+		search_filter='(objectClass=organizationalUnit)',
+		search_scope=SUBTREE,
+		attributes=['DN'])
+	connection.entries.reverse()
+	for entry in connection.entries:
+		dn=entry.entry_get_dn()
+		tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='hasBlur')
 
-	except:
-		t=Toplevel(root)
-		t.grab_set()
-		t.title('خطا')
-		t.columnconfigure(0,minsize='150')
-		ttk.Label(t,text='.امکان برقراری ارتباط با سرور وجود ندارد').grid(row=0,column=0,padx=50,pady=20)
-		myButton=ttk.Button(t,text='بازگشت',command= lambda: close(root,t))
-		myButton.grid(row=1,column=0,padx=10,pady=(10,10))
-		myButton.bind('<Return>',lambda ev: close(root,t))
+	connection.search(search_base='dc=salon,dc=iut',
+		search_filter='(objectClass=user)',
+		search_scope=SUBTREE,
+		attributes=['cn','sn','studentNumber','DN'])
+	for entry in connection.entries:
+		dn=entry.entry_get_dn()
+		tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='hasBlur')
+
+		# t=Toplevel(root)
+		# t.grab_set()
+		# t.title('خطا')
+		# t.columnconfigure(0,minsize='150')
+		# ttk.Label(t,text='.امکان برقراری ارتباط با سرور وجود ندارد').grid(row=0,column=0,padx=50,pady=20)
+		# myButton=ttk.Button(t,text='بازگشت',command= lambda: close(root,t))
+		# myButton.grid(row=1,column=0,padx=10,pady=(10,10))
+		# myButton.bind('<Return>',lambda ev: close(root,t))
 
 def setDefaultIP(configurations,w):
 	def setDefaultIPInner():
@@ -139,7 +142,6 @@ def updateConf(configurations):
 
 def toggleColor(flag):
 	current=tree.focus()
-	print(current)
 	state=(('hasFocus','hasBlur'),('hasBlur','hasFocus'))[flag]
 	tree.item(current,tags=[w.replace(state[0],state[1]) for w in tree.item(current)['tags']])
 
