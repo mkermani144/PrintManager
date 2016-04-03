@@ -146,7 +146,6 @@ def toggleColor(flag,l):
 		if p:
 			tree.item(p,tags=[w.replace(state[0],'yellow') for w in tree.item(p)['tags']])
 			l=[tree.item(x)['tags'] for x in tree.get_children(p)]
-			print(l)
 			if(flag==1):
 				for child in l:
 					if 'yellow' in child or 'white' in child:
@@ -165,6 +164,7 @@ def toggleColor(flag,l):
 			tree.item(e,tags=[w.replace(state[0],state[1]) for w in tree.item(e)['tags']])
 			tree.item(e,tags=[w.replace('yellow',state[1]) for w in tree.item(e)['tags']])
 			toggleChildColor(e)
+
 	state=('white','green') if flag==1 else ('green','white')
 	for entry in l:
 		tree.item(entry,tags=[w.replace(state[0],state[1]) for w in tree.item(entry)['tags']])
@@ -172,6 +172,8 @@ def toggleColor(flag,l):
 		toggleFatherColor(entry)
 		toggleChildColor(entry)
 
+	tree.selection_set(tuple())
+	
 def addToDB(e):
 	MDB = 'db.mdb'
 	DRV = '{Microsoft Access Driver (*.mdb)}'
