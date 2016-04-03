@@ -54,7 +54,7 @@ def connect(ip,username,password,w):
 
 	connection.bind()
 	print(connection.result)
-	tree.insert('',0,text='salon.iut',iid='DC=salon,DC=iut',tags='hasBlur')
+	tree.insert('',0,text='salon.iut',iid='DC=salon,DC=iut',tags='white')
 	connection.search(search_base='dc=salon,dc=iut',
 		search_filter='(objectClass=organizationalUnit)',
 		search_scope=SUBTREE,
@@ -62,7 +62,7 @@ def connect(ip,username,password,w):
 	connection.entries.reverse()
 	for entry in connection.entries:
 		dn=entry.entry_get_dn()
-		tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='hasBlur')
+		tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='white')
 
 	connection.search(search_base='dc=salon,dc=iut',
 		search_filter='(objectClass=user)',
@@ -70,7 +70,7 @@ def connect(ip,username,password,w):
 		attributes=['cn','sn','studentNumber','DN'])
 	for entry in connection.entries:
 		dn=entry.entry_get_dn()
-		tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='hasBlur')
+		tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='white')
 
 		# t=Toplevel(root)
 		# t.grab_set()
@@ -133,17 +133,44 @@ def toggleEntry(rbv,entry,ip):
 	else:
 		entry.config(state='disabled')
 		with open('conf') as f:
-			ip.set(f.readlines()[0])
+			ip.set(f.readlines()[0].rstrip())
 
 def updateConf(configurations):
 	with open('conf','w') as f:
 		for item in configurations:
 			f.write(item+'\n')
 
-def toggleColor(flag):
-	current=tree.focus()
-	state=(('hasFocus','hasBlur'),('hasBlur','hasFocus'))[flag]
-	tree.item(current,tags=[w.replace(state[0],state[1]) for w in tree.item(current)['tags']])
+def toggleColor(flag,l):
+	def toggleFatherColor(entry):
+		p=tree.parent(entry)
+		if p:
+			tree.item(p,tags=[w.replace(state[0],'yellow') for w in tree.item(p)['tags']])
+			l=[tree.item(x)['tags'] for x in tree.get_children(p)]
+			print(l)
+			if(flag==1):
+				for child in l:
+					if 'yellow' in child or 'white' in child:
+						break;
+				else:
+					tree.item(p,tags=[w.replace('yellow','green') for w in tree.item(p)['tags']])
+			else:
+				for child in l:
+					if 'yellow' in child or 'green' in child:
+						break;
+				else:
+					tree.item(p,tags=[w.replace('yellow','white') for w in tree.item(p)['tags']])
+			toggleFatherColor(tree.parent(entry))
+	def toggleChildColor(entry):
+		for e in tree.get_children(entry):
+			tree.item(e,tags=[w.replace(state[0],state[1]) for w in tree.item(e)['tags']])
+			tree.item(e,tags=[w.replace('yellow',state[1]) for w in tree.item(e)['tags']])
+			toggleChildColor(e)
+	state=('white','green') if flag==1 else ('green','white')
+	for entry in l:
+		tree.item(entry,tags=[w.replace(state[0],state[1]) for w in tree.item(entry)['tags']])
+		tree.item(entry,tags=[w.replace('yellow',state[1]) for w in tree.item(entry)['tags']])
+		toggleFatherColor(entry)
+		toggleChildColor(entry)
 
 def addToDB(e):
 	MDB = 'db.mdb'
@@ -151,7 +178,7 @@ def addToDB(e):
 	# PWD = 'mypassword'
 	connection = pyodbc.connect('DRIVER={};DBQ={}'.format(DRV,MDB))
 	cursor=connection.cursor()
-	selectionIIDs=tree.tag_has('hasFocus')
+	selectionIIDs=tree.tag_has('green')
 	for item in selectionIIDs:
 		SQ='''
 		IF NOT EXISTS(SELECT * from db WHERE firstName=%s AND lastName=%s AND studentNumber=%s)
@@ -226,23 +253,24 @@ tree.grid(row=0,column=0,columnspan=2,pady=(5,0),sticky='nws')
 s=ttk.Scrollbar(treeLF,orient=VERTICAL,command=tree.yview)
 s.grid(row=0,column=2,pady=(5,0),sticky='ns')
 tree.configure(yscrollcommand=s.set)
-tree.tag_configure('hasFocus',background='green')
-tree.tag_configure('hasBlur',background='white')
-b=ttk.Button(treeLF,text='انتخاب',command= lambda: toggleColor(1))
+tree.tag_configure('green',background='green')
+tree.tag_configure('white',background='white')
+tree.tag_configure('yellow',background='yellow')
+b=ttk.Button(treeLF,text='انتخاب',command= lambda: toggleColor(1,(tree.focus(),)))
 b.grid(row=1,column=0,sticky='news',padx=5,pady=5)
 b.bind('<Return>',lambda ev: toggleColor(1))
-b2=ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0))
+b2=ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0,(tree.focus(),)))
 b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
 b2.bind('<Return>',lambda ev: toggleColor(0))
 
-# tree.insert('', 'end', text='button', tags=('hasBlur', 'simple'))
-# tree.insert('', 'end', text='button2', tags=( 'hasBlur','simple'))
-# tree.insert('', 'end', text='but5ton', tags=('hasBlur', 'simple'))
-# tree.insert('', 'end', text='button3', tags=( 'hasBlur','simple'))
-# tree.insert('', 'end', text='butt546on', tags=('hasBlur', 'simple'))
-# tree.insert('', 'end', text='but456345ton', tags=( 'hasBlur','simple'))
-# tree.insert('', 'end', text='but34534534534ton', tags=('hasBlur', 'simple'))
-# tree.insert('', 'end', text='but345345345345345345ton', tags=( 'hasBlur','simple'))
+# tree.insert('', 'end', text='button', tags=('white', 'simple'))
+# tree.insert('', 'end', text='button2', tags=( 'white','simple'))
+# tree.insert('', 'end', text='but5ton', tags=('white', 'simple'))
+# tree.insert('', 'end', text='button3', tags=( 'white','simple'))
+# tree.insert('', 'end', text='butt546on', tags=('white', 'simple'))
+# tree.insert('', 'end', text='but456345ton', tags=( 'white','simple'))
+# tree.insert('', 'end', text='but34534534534ton', tags=('white', 'simple'))
+# tree.insert('', 'end', text='but345345345345345345ton', tags=( 'white','simple'))
 
 addB=ttk.Button(mainframe,text='افزودن موارد انتخابی',command=addToDB)
 addB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
