@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from re import match
 from ldap3 import *
-# import pyodbc
+import pypyodbc
 
 def close(*args):
 	for w in filter(lambda w: args.index(w),args):
@@ -286,6 +286,31 @@ with open('conf') as f:
 	if(configurations[1]=='1'):
 		configurations[1]='0'
 		updateConf(configurations)
+		pypyodbc.win_create_mdb('database.mdb')
+		conn=pypyodbc.win_connect_mdb('database.mdb')
+		cur=conn.cursor()
+		query='''
+			CREATE TABLE credits
+			(
+				first_name VARCHAR(30),
+				last_name VARCHAR(30),
+				entrance_year INTEGER,
+				student_number INTEGER,
+				grade VARCHAR(3),
+				department VARCHAR(15),
+				field VARCHAR(15),
+				credit INTEGER,
+				max_credit INTEGER,
+				min_credit INTEGER,
+				paper_credit INTEGER,
+				paper_max_credit INTEGER,
+				discount VARCHAR(3)
+			)
+		'''
+		cur.execute(query)
+		cur.close()
+		conn.commit()
+		conn.close()
 		t=Toplevel(root)
 		t.grab_set()
 		t.focus()
