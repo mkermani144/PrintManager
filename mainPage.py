@@ -51,26 +51,27 @@ def connect(ip,username,password,w):
 	server=Server(ip.get()) # use_ssl=False
 	print(ip.get())
 	connection=Connection(server,username.get(),password.get(),read_only=True)
-
 	connection.bind()
-	print(connection.result)
 	tree.insert('',0,text='salon.iut',iid='DC=salon,DC=iut',tags='white')
 	connection.search(search_base='dc=salon,dc=iut',
 		search_filter='(objectClass=organizationalUnit)',
 		search_scope=SUBTREE,
-		attributes=['DN'])
+		attributes=['dn'])
 	connection.entries.reverse()
 	for entry in connection.entries:
 		dn=entry.entry_get_dn()
-		tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='white')
+		tree.insert(dn[dn.find(',')+1:],0,text=dn[dn.find('=')+1:dn.find(',')],iid=dn,tags='white')
 
 	connection.search(search_base='dc=salon,dc=iut',
 		search_filter='(objectClass=user)',
 		search_scope=SUBTREE,
-		attributes=['cn','sn','studentNumber','DN'])
+		attributes=['cn','sn','studentNumber','dn'])
 	for entry in connection.entries:
 		dn=entry.entry_get_dn()
-		tree.insert(dn[dn.find(',')+1:],0,text=dn[:dn.find(',')+1],iid=dn,tags='white')
+		try:
+			tree.insert(dn[dn.find(',')+1:],0,text=entry['cn'],iid=dn,tags='white')
+		except:
+			pass
 
 		# t=Toplevel(root)
 		# t.grab_set()
@@ -173,7 +174,7 @@ def toggleColor(flag,l):
 		toggleChildColor(entry)
 
 	tree.selection_set(tuple())
-	
+
 def addToDB(e):
 	MDB = 'db.mdb'
 	DRV = '{Microsoft Access Driver (*.mdb)}'
