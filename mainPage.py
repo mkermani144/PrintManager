@@ -48,7 +48,7 @@ def validateIP(ip):
 
 def connect(ip,e):
 	if validateIP(ip):
-		server=Server(ip.get(),use_ssl=True)
+		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
 		username='cn=administrator,cn=users,dc=salon,dc=iut'
 		password='Server2014'
 		connection=Connection(server,username,password,read_only=True)
@@ -73,7 +73,6 @@ def connect(ip,e):
 					tree.insert(dn[dn.find(',')+1:],0,text=entry['cn'],iid=dn,tags='white')
 				except:
 					pass
-
 			connection.unbind()
 		except:
 			t=Toplevel(root)
