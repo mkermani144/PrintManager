@@ -13,74 +13,90 @@ def close(*args):
 def validateIP(ip):
 	return re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$',ip.get())
 
-def userPass(ip,w,e):
+# def userPass(ip,w,e):
+# 	if validateIP(ip):
+# 		t=Toplevel(root)
+# 		t.grab_set()
+# 		t.title('ورود کاربر')
+# 		ttk.Label(t,text=':نام کاربری و رمز عبور را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
+# 		username=StringVar()
+# 		password=StringVar()
+# 		ttk.Label(t,text=':نام کاربری').grid(row=1,column=1,padx=(0,10),pady=10,sticky='e')
+# 		ttk.Label(t,text=':رمز عبور').grid(row=2,column=1,padx=(0,10),pady=10,sticky='e')
+# 		e1=ttk.Entry(t,width=45,textvariable=username)
+# 		e1.grid(row=1,column=0,padx=(10,30),pady=10)
+# 		e2=ttk.Entry(t,width=45,textvariable=password,show='\u2022') # \u2022 is bullet character
+# 		e2.grid(row=2,column=0,padx=(10,30),pady=10)
+# 		myButton=ttk.Button(t,text='تایید',command= lambda: connect(ip,username,password,t))
+# 		myButton.grid(row=3,column=0,columnspan=2,padx=10,pady=10,sticky='n')
+# 		myButton.bind('<Return>',lambda ev: connect(ip,username,password,t))
+# 		e1.focus()
+# 	else:
+# 		t=Toplevel(w)
+# 		t.grab_set()
+# 		t.title('خطا')
+# 		t.columnconfigure(0,minsize='150')
+# 		t.columnconfigure(1,minsize='150')
+# 		ttk.Label(t,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
+# 		b=ttk.Button(t,text='تلاش مجدد',command= lambda: [close(w,t),e.delete(0,'end'),e.focus()])
+# 		b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
+# 		b.bind('<Return>',lambda ev: [close(w,t),e.delete(0,'end')])
+# 		b2=ttk.Button(t,text='لغو',command= lambda: close(root,t))
+# 		b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
+# 		b2.bind('<Return>',lambda ev: close(root,t))
+# 		b.focus()
+
+def connect(ip,e):
 	if validateIP(ip):
-		t=Toplevel(root)
-		t.grab_set()
-		t.title('ورود کاربر')
-		ttk.Label(t,text=':نام کاربری و رمز عبور را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
-		username=StringVar()
-		password=StringVar()
-		ttk.Label(t,text=':نام کاربری').grid(row=1,column=1,padx=(0,10),pady=10,sticky='e')
-		ttk.Label(t,text=':رمز عبور').grid(row=2,column=1,padx=(0,10),pady=10,sticky='e')
-		e1=ttk.Entry(t,width=45,textvariable=username)
-		e1.grid(row=1,column=0,padx=(10,30),pady=10)
-		e2=ttk.Entry(t,width=45,textvariable=password,show='\u2022') # \u2022 is bullet character
-		e2.grid(row=2,column=0,padx=(10,30),pady=10)
-		myButton=ttk.Button(t,text='تایید',command= lambda: connect(ip,username,password,t))
-		myButton.grid(row=3,column=0,columnspan=2,padx=10,pady=10,sticky='n')
-		myButton.bind('<Return>',lambda ev: connect(ip,username,password,t))
-		e1.focus()
+		server=Server(ip.get(),use_ssl=True)
+		username='cn=administrator,cn=users,dc=salon,dc=iut'
+		password='Server2014'
+		connection=Connection(server,username,password,read_only=True)
+		connection.bind()
+		tree.insert('',0,text='salon.iut',iid='DC=salon,DC=iut',tags='white')
+		connection.search(search_base='dc=salon,dc=iut',
+			search_filter='(objectClass=organizationalUnit)',
+			search_scope=SUBTREE,)
+		connection.entries.reverse()
+		for entry in connection.entries:
+			dn=entry.entry_get_dn()
+			tree.insert(dn[dn.find(',')+1:],0,text=dn[dn.find('=')+1:dn.find(',')],iid=dn,tags='white')
+
+		connection.search(search_base='dc=salon,dc=iut',
+			search_filter='(objectClass=user)',
+			search_scope=SUBTREE,
+			attributes=['cn','sn','studentNumber'])
+		for entry in connection.entries:
+			dn=entry.entry_get_dn()
+			try:
+				tree.insert(dn[dn.find(',')+1:],0,text=entry['cn'],iid=dn,tags='white')
+			except:
+				pass
+
+			# t=Toplevel(root)
+			# t.grab_set()
+			# t.title('خطا')
+			# t.columnconfigure(0,minsize='150')
+			# ttk.Label(t,text='.امکان برقراری ارتباط با سرور وجود ندارد').grid(row=0,column=0,padx=50,pady=20)
+			# myButton=ttk.Button(t,text='بازگشت',command= lambda: close(root,t))
+			# myButton.grid(row=1,column=0,padx=10,pady=(10,10))
+			# myButton.bind('<Return>',lambda ev: close(root,t))
+		connection.unbind()
+
 	else:
-		t=Toplevel(w)
+		t=Toplevel(root)
 		t.grab_set()
 		t.title('خطا')
 		t.columnconfigure(0,minsize='150')
 		t.columnconfigure(1,minsize='150')
 		ttk.Label(t,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
-		b=ttk.Button(t,text='تلاش مجدد',command= lambda: [close(w,t),e.delete(0,'end'),e.focus()])
+		b=ttk.Button(t,text='تلاش مجدد',command= lambda: [close(root,t),e.delete(0,'end'),e.focus()])
 		b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
 		b.bind('<Return>',lambda ev: [close(w,t),e.delete(0,'end')])
 		b2=ttk.Button(t,text='لغو',command= lambda: close(root,t))
 		b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
 		b2.bind('<Return>',lambda ev: close(root,t))
 		b.focus()
-
-def connect(ip,username,password,w):
-	w.destroy()
-	server=Server(ip.get()) # use_ssl=False
-	print(ip.get())
-	connection=Connection(server,username.get(),password.get(),read_only=True)
-	connection.bind()
-	tree.insert('',0,text='salon.iut',iid='DC=salon,DC=iut',tags='white')
-	connection.search(search_base='dc=salon,dc=iut',
-		search_filter='(objectClass=organizationalUnit)',
-		search_scope=SUBTREE,
-		attributes=['dn'])
-	connection.entries.reverse()
-	for entry in connection.entries:
-		dn=entry.entry_get_dn()
-		tree.insert(dn[dn.find(',')+1:],0,text=dn[dn.find('=')+1:dn.find(',')],iid=dn,tags='white')
-
-	connection.search(search_base='dc=salon,dc=iut',
-		search_filter='(objectClass=user)',
-		search_scope=SUBTREE,
-		attributes=['cn','sn','studentNumber','dn'])
-	for entry in connection.entries:
-		dn=entry.entry_get_dn()
-		try:
-			tree.insert(dn[dn.find(',')+1:],0,text=entry['cn'],iid=dn,tags='white')
-		except:
-			pass
-
-		# t=Toplevel(root)
-		# t.grab_set()
-		# t.title('خطا')
-		# t.columnconfigure(0,minsize='150')
-		# ttk.Label(t,text='.امکان برقراری ارتباط با سرور وجود ندارد').grid(row=0,column=0,padx=50,pady=20)
-		# myButton=ttk.Button(t,text='بازگشت',command= lambda: close(root,t))
-		# myButton.grid(row=1,column=0,padx=10,pady=(10,10))
-		# myButton.bind('<Return>',lambda ev: close(root,t))
 
 def setDefaultIP(configurations,w):
 	def setDefaultIPInner():
@@ -216,9 +232,9 @@ e=ttk.Entry(connectLF,textvariable=ip)
 e.grid(row=3,sticky='we',padx=(5,50),pady=5)
 toggleEntry(v,e,ip)
 ttk.Label(connectLF,text=':آی پی سرور').grid(row=3,column=0,columnspan=2,padx=5,pady=(0,5),sticky='e')
-b=ttk.Button(connectLF,text='اتصال',command= lambda: userPass(ip,root,e) )
+b=ttk.Button(connectLF,text='اتصال',command= lambda: connect(ip,e) )
 b.grid(row=4,column=0,columnspan=2,sticky='news',padx=5,pady=5)
-b.bind('<Return>',lambda ev: userPass(ip,root,e))
+b.bind('<Return>',lambda ev: connect(ip,e))
 
 quotaLF=ttk.Labelframe(mainframe,text='سهمیه',width=200,height=350,labelanchor='ne')
 quotaLF.grid(row=2,column=1,padx=(0,5),pady=5,sticky='news')
