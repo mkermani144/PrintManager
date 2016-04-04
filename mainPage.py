@@ -13,39 +13,6 @@ def close(*args):
 def validateIP(ip):
 	return re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$',ip.get())
 
-# def userPass(ip,w,e):
-# 	if validateIP(ip):
-# 		t=Toplevel(root)
-# 		t.grab_set()
-# 		t.title('ورود کاربر')
-# 		ttk.Label(t,text=':نام کاربری و رمز عبور را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
-# 		username=StringVar()
-# 		password=StringVar()
-# 		ttk.Label(t,text=':نام کاربری').grid(row=1,column=1,padx=(0,10),pady=10,sticky='e')
-# 		ttk.Label(t,text=':رمز عبور').grid(row=2,column=1,padx=(0,10),pady=10,sticky='e')
-# 		e1=ttk.Entry(t,width=45,textvariable=username)
-# 		e1.grid(row=1,column=0,padx=(10,30),pady=10)
-# 		e2=ttk.Entry(t,width=45,textvariable=password,show='\u2022') # \u2022 is bullet character
-# 		e2.grid(row=2,column=0,padx=(10,30),pady=10)
-# 		myButton=ttk.Button(t,text='تایید',command= lambda: connect(ip,username,password,t))
-# 		myButton.grid(row=3,column=0,columnspan=2,padx=10,pady=10,sticky='n')
-# 		myButton.bind('<Return>',lambda ev: connect(ip,username,password,t))
-# 		e1.focus()
-# 	else:
-# 		t=Toplevel(w)
-# 		t.grab_set()
-# 		t.title('خطا')
-# 		t.columnconfigure(0,minsize='150')
-# 		t.columnconfigure(1,minsize='150')
-# 		ttk.Label(t,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
-# 		b=ttk.Button(t,text='تلاش مجدد',command= lambda: [close(w,t),e.delete(0,'end'),e.focus()])
-# 		b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
-# 		b.bind('<Return>',lambda ev: [close(w,t),e.delete(0,'end')])
-# 		b2=ttk.Button(t,text='لغو',command= lambda: close(root,t))
-# 		b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
-# 		b2.bind('<Return>',lambda ev: close(root,t))
-# 		b.focus()
-
 def connect(ip,e):
 	if validateIP(ip):
 		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
@@ -227,7 +194,7 @@ v.set('default')
 ip=StringVar()
 ttk.Radiobutton(connectLF,variable=v,value='new',command= lambda: toggleEntry(v,e,ip)).grid(row=1,column=1,sticky='e')
 ttk.Radiobutton(connectLF,variable=v,value='default',command= lambda: toggleEntry(v,e,ip)).grid(row=2,column=1,sticky='e')
-ttk.Label(connectLF,text='اتصال به سرور جدید').grid(row=1,padx=5,pady=(0,5),sticky='e')
+ttk.Label(connectLF,text='اتصال  به سرور جدید').grid(row=1,padx=5,pady=(0,5),sticky='e')
 ttk.Label(connectLF,text='اتصال به سرور پیش فرض').grid(row=2,padx=5,pady=(0,5),sticky='e')
 e=ttk.Entry(connectLF,textvariable=ip)
 e.grid(row=3,sticky='we',padx=(5,50),pady=5)
@@ -283,18 +250,17 @@ b2=ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0,t
 b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
 b2.bind('<Return>',lambda ev: toggleColor(0))
 
-# tree.insert('', 'end', text='button', tags=('white', 'simple'))
-# tree.insert('', 'end', text='button2', tags=( 'white','simple'))
-# tree.insert('', 'end', text='but5ton', tags=('white', 'simple'))
-# tree.insert('', 'end', text='button3', tags=( 'white','simple'))
-# tree.insert('', 'end', text='butt546on', tags=('white', 'simple'))
-# tree.insert('', 'end', text='but456345ton', tags=( 'white','simple'))
-# tree.insert('', 'end', text='but34534534534ton', tags=('white', 'simple'))
-# tree.insert('', 'end', text='but345345345345345345ton', tags=( 'white','simple'))
-
 addB=ttk.Button(mainframe,text='افزودن موارد انتخابی',command=addToDB)
 addB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
 addB.bind('<Return>',addToDB)
+
+root.option_add('*tearOff', FALSE)
+menubar=Menu(root)
+root.configure(menu=menubar)
+menu1 = Menu(menubar)
+menubar.add_cascade(menu=menu1, label='منو')
+menu1.add_command(label='تنظیمات')
+menu1.add_command(label='درباره')
 
 with open('conf') as f:
 	configurations=f.readlines()
@@ -339,6 +305,5 @@ with open('conf') as f:
 		n=ttk.Button(t,text='خیر',command= lambda: close(root,t))
 		n.grid(row=2,column=1,padx=10,pady=10,sticky='w')
 		n.bind('<Return>',lambda ev: close(root,t))
-
 
 root.mainloop()
