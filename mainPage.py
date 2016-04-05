@@ -454,6 +454,41 @@ updateFrame.grid(row=0,column=0)
 '''
 ------------------------------------------
 
+Result tree section
+
+------------------------------------------
+'''
+treeLF2=ttk.Labelframe(updateFrame,text='نتیجه ی جستجو',labelanchor='ne')
+treeLF2.grid(row=0,column=0,rowspan=3,padx=5,pady=5,sticky='news')
+treeLF2.rowconfigure(0,weight=1)
+tree2=ttk.Treeview(treeLF2,columns=['Grade','Department'])
+tree2.heading('#0', text='Name')
+tree2.heading('#1', text='Grade')
+tree2.heading('#2', text='Department')
+tree2.column('#0',width=100)
+tree2.column('#1',width=50)
+tree2.column('#2',width=50)
+tree2.grid(row=0,column=0,columnspan=2,pady=(5,0),sticky='nws')
+s2=ttk.Scrollbar(treeLF2,orient=VERTICAL,command=tree2.yview)
+s2.grid(row=0,column=2,pady=(5,0),sticky='ns')
+tree2.configure(yscrollcommand=s2.set)
+s3=ttk.Scrollbar(treeLF2,orient=HORIZONTAL,command=tree2.xview)
+s3.grid(row=1,column=0,columnspan=2,pady=(5,0),sticky='ew')
+tree2.configure(xscrollcommand=s3.set)
+# tree.tag_configure('green',background='#88CC22')
+# tree.tag_configure('white',background='white')
+# tree.tag_configure('yellow',background='#CCEE66')
+# b=ttk.Button(treeLF,text='انتخاب',command= lambda: toggleColor(1,tree.selection()))
+# b.grid(row=1,column=0,sticky='news',padx=5,pady=5)
+# b.bind('<Return>',lambda ev: toggleColor(1))
+# b2=ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0,tree.selection()))
+# b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
+# b2.bind('<Return>',lambda ev: toggleColor(0))
+
+
+'''
+------------------------------------------
+
 Adding frames to notebook
 
 ------------------------------------------
