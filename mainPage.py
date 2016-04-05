@@ -183,9 +183,19 @@ root=Tk()
 root.title('نرم افزار مدیریت پرینت - مرکز فناوری اطلاعات - دانشگاه صنعتی اصفهان')
 root.resizable(False,False)
 
-mainframe=ttk.Frame(root).grid(row=0,column=0,sticky='news')
+nb=ttk.Notebook(root)
+nb.grid(row=0,column=0)
+ttk.Style().configure('TNotebook',tabposition='ne')
 
-connectLF=ttk.Labelframe(mainframe,text='اتصال',width=200,height=50,labelanchor='ne')
+addNewFrame=ttk.Frame(nb)
+addNewFrame.grid(row=0,column=1)
+updateFrame=ttk.Frame(nb)
+updateFrame.grid(row=0,column=0)
+
+nb.add(updateFrame,text='به روزرسانی کاربران')
+nb.add(addNewFrame,text='افزودن کاربر جدید')
+
+connectLF=ttk.Labelframe(addNewFrame,text='اتصال',width=200,height=50,labelanchor='ne')
 connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky='news')
 connectLF.columnconfigure(0,weight=1)
 ttk.Label(connectLF,text=':نوع اتصال به سرور').grid(row=0,column=0,columnspan=2,padx=5,pady=(0,5),sticky='e')
@@ -204,7 +214,7 @@ b=ttk.Button(connectLF,text='اتصال',command= lambda: connect(ip,e) )
 b.grid(row=4,column=0,columnspan=2,sticky='news',padx=5,pady=5)
 b.bind('<Return>',lambda ev: connect(ip,e))
 
-quotaLF=ttk.Labelframe(mainframe,text='سهمیه',width=200,height=350,labelanchor='ne')
+quotaLF=ttk.Labelframe(addNewFrame,text='سهمیه',width=200,height=350,labelanchor='ne')
 quotaLF.grid(row=2,column=1,padx=(0,5),pady=5,sticky='news')
 quotaLF.columnconfigure(2,weight=1)
 credit=StringVar()
@@ -232,7 +242,7 @@ ttk.Label(quotaLF,text=':سهمیه ی کاغذ').grid(row=3,column=2,padx=5,pad
 ttk.Label(quotaLF,text=':حداکثر سهمیه ی کاغذ مجاز').grid(row=4,column=2,padx=5,pady=5,sticky='e')
 ttk.Label(quotaLF,text=':تخفیف').grid(row=5,column=2,padx=5,pady=(5,10),sticky='e')
 
-treeLF=ttk.Labelframe(mainframe,text='نتیجه ی جستجو',labelanchor='ne')
+treeLF=ttk.Labelframe(addNewFrame,text='نتیجه ی جستجو',labelanchor='ne')
 treeLF.grid(row=0,column=0,rowspan=3,padx=5,pady=5,sticky='news')
 treeLF.rowconfigure(0,weight=1)
 tree=ttk.Treeview(treeLF)
@@ -250,7 +260,7 @@ b2=ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0,t
 b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
 b2.bind('<Return>',lambda ev: toggleColor(0))
 
-addB=ttk.Button(mainframe,text='افزودن موارد انتخابی',command=addToDB)
+addB=ttk.Button(addNewFrame,text='افزودن موارد انتخابی',command=addToDB)
 addB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
 addB.bind('<Return>',addToDB)
 
