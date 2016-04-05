@@ -60,19 +60,24 @@ def connect(ip,e):
 			connection.search(search_base='dc=salon,dc=iut',
 				search_filter='(objectClass=organizationalUnit)',
 				search_scope=SUBTREE,)
-			connection.entries.reverse()
+			connection.entries.sort()
+			i=0
 			for entry in connection.entries:
 				dn=entry.entry_get_dn()
-				tree.insert(dn[dn.find(',')+1:],0,text=dn[dn.find('=')+1:dn.find(',')],iid=dn,tags='white')
+				tree.insert(dn[dn.find(',')+1:],i,text=dn[dn.find('=')+1:dn.find(',')],iid=dn,tags='white')
+				i+=1
 
 			connection.search(search_base='dc=salon,dc=iut',
 				search_filter='(objectClass=user)',
 				search_scope=SUBTREE,
 				attributes=['cn','sn','studentNumber'])
+			connection.entries.sort()
+			i=0
 			for entry in connection.entries:
 				dn=entry.entry_get_dn()
 				try:
-					tree.insert(dn[dn.find(',')+1:],0,text=entry['cn'],iid=dn,tags='white')
+					tree.insert(dn[dn.find(',')+1:],i,text=entry['cn'],iid=dn,tags='white')
+					i+=1
 				except:
 					pass
 			connection.unbind()
