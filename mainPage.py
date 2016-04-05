@@ -4,15 +4,50 @@ from re import match
 from ldap3 import *
 import pypyodbc
 
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to destroy widgets passed to it
+excluding the first one
+
+>>> *args : All of the widgets to be
+			destroyed and the widget to be
+			kept.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
 def close(*args):
 	for w in filter(lambda w: args.index(w),args):
 		w.destroy()
 	args[0].grab_set()
 	args[0].focus()
 
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to see if the IP is valid
+
+>>> ip : The IP to be validated.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
 def validateIP(ip):
 	return re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$',ip.get())
 
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to connect to the LDAP server and
+to make the result tree
+
+>>> ip : The IP of the LDAP server.
+>>> e : Entry of above IP.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
 def connect(ip,e):
 	if validateIP(ip):
 		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
@@ -66,6 +101,21 @@ def connect(ip,e):
 		b2.bind('<Return>',lambda ev: close(root,t))
 		b.focus()
 
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to get the default IP of the
+server from user and set it to the file
+
+>>> configurations : A list containing
+					 configurations of
+					 the program.
+>>> w : Popup widget asking the user if he
+		wants to change default ip.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
 def setDefaultIP(configurations,w):
 	def setDefaultIPInner():
 		if validateIP(ip):
@@ -111,6 +161,19 @@ def setDefaultIP(configurations,w):
 	b2.grid(row=2,column=1,padx=10,pady=10,sticky='w')
 	b2.bind('<Return>',lambda ev: close(root,t))
 
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to toggle between two radio
+buttons
+
+>>> rbv : Radio button variable indicating
+		  state of radio buttons.
+>>> entry : Entry of the IP address.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
 def toggleEntry(rbv,entry,ip):
 	if rbv.get()=='new':
 		entry.config(state='enabled')
@@ -120,11 +183,38 @@ def toggleEntry(rbv,entry,ip):
 		with open('conf') as f:
 			ip.set(f.readlines()[0].rstrip())
 
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to update the conf file
+
+>>> configuration : List contaning
+					configurations of the
+					program.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
 def updateConf(configurations):
 	with open('conf','w') as f:
 		for item in configurations:
 			f.write(item+'\n')
 
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to toggle color of result tree
+entries when they are selected/deselected
+
+>>> flag : Flag indicating if the entry
+		   should be disabled/enabled.
+>>> l : List containing all of result tree
+		entries whose colors should be
+		toggled
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
 def toggleColor(flag,l):
 	def toggleFatherColor(entry):
 		p=tree.parent(entry)
@@ -159,6 +249,17 @@ def toggleColor(flag,l):
 
 	tree.selection_set(tuple())
 
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to add selected result tree
+entries to the database
+
+>>> e : Event object.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
 def addToDB(e):
 	MDB = 'db.mdb'
 	DRV = '{Microsoft Access Driver (*.mdb)}'
@@ -179,22 +280,50 @@ def addToDB(e):
 	connection.close()
 
 
+
+
+'''
+==========================================
+
+Main Window
+
+==========================================
+'''
 root=Tk()
 root.title('نرم افزار مدیریت پرینت - مرکز فناوری اطلاعات - دانشگاه صنعتی اصفهان')
 root.resizable(False,False)
 
+
+'''
+==========================================
+
+Notebook
+
+==========================================
+'''
 nb=ttk.Notebook(root)
 nb.grid(row=0,column=0)
 ttk.Style().configure('TNotebook',tabposition='ne')
 
+
+'''
+==========================================
+
+Tab to be used for adding new entries
+
+==========================================
+'''
 addNewFrame=ttk.Frame(nb)
 addNewFrame.grid(row=0,column=1)
-updateFrame=ttk.Frame(nb)
-updateFrame.grid(row=0,column=0)
 
-nb.add(updateFrame,text='به روزرسانی کاربران')
-nb.add(addNewFrame,text='افزودن کاربر جدید')
 
+'''
+------------------------------------------
+
+Connect section
+
+------------------------------------------
+'''
 connectLF=ttk.Labelframe(addNewFrame,text='اتصال',width=200,height=50,labelanchor='ne')
 connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky='news')
 connectLF.columnconfigure(0,weight=1)
@@ -214,6 +343,14 @@ b=ttk.Button(connectLF,text='اتصال',command= lambda: connect(ip,e) )
 b.grid(row=4,column=0,columnspan=2,sticky='news',padx=5,pady=5)
 b.bind('<Return>',lambda ev: connect(ip,e))
 
+
+'''
+------------------------------------------
+
+Quota section
+
+------------------------------------------
+'''
 quotaLF=ttk.Labelframe(addNewFrame,text='سهمیه',width=200,height=350,labelanchor='ne')
 quotaLF.grid(row=2,column=1,padx=(0,5),pady=5,sticky='news')
 quotaLF.columnconfigure(2,weight=1)
@@ -242,6 +379,14 @@ ttk.Label(quotaLF,text=':سهمیه ی کاغذ').grid(row=3,column=2,padx=5,pad
 ttk.Label(quotaLF,text=':حداکثر سهمیه ی کاغذ مجاز').grid(row=4,column=2,padx=5,pady=5,sticky='e')
 ttk.Label(quotaLF,text=':تخفیف').grid(row=5,column=2,padx=5,pady=(5,10),sticky='e')
 
+
+'''
+------------------------------------------
+
+Result tree section
+
+------------------------------------------
+'''
 treeLF=ttk.Labelframe(addNewFrame,text='نتیجه ی جستجو',labelanchor='ne')
 treeLF.grid(row=0,column=0,rowspan=3,padx=5,pady=5,sticky='news')
 treeLF.rowconfigure(0,weight=1)
@@ -260,10 +405,26 @@ b2=ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0,t
 b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
 b2.bind('<Return>',lambda ev: toggleColor(0))
 
+
+'''
+------------------------------------------
+
+Add to database button
+
+------------------------------------------
+'''
 addB=ttk.Button(addNewFrame,text='افزودن موارد انتخابی',command=addToDB)
 addB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
 addB.bind('<Return>',addToDB)
 
+
+'''
+==========================================
+
+Menubar
+
+==========================================
+'''
 root.option_add('*tearOff', FALSE)
 menubar=Menu(root)
 root.configure(menu=menubar)
@@ -272,6 +433,38 @@ menubar.add_cascade(menu=menu1, label='منو')
 menu1.add_command(label='تنظیمات')
 menu1.add_command(label='درباره')
 
+
+'''
+==========================================
+
+Tab to be used for updating existing
+entries
+
+==========================================
+'''
+updateFrame=ttk.Frame(nb)
+updateFrame.grid(row=0,column=0)
+
+
+'''
+------------------------------------------
+
+Adding frames to notebook
+
+------------------------------------------
+'''
+nb.add(updateFrame,text='به روزرسانی کاربران')
+nb.add(addNewFrame,text='افزودن کاربر جدید')
+
+
+'''
+==========================================
+
+Opening file and checking whether it is
+first time the program is run
+
+==========================================
+'''
 with open('conf') as f:
 	configurations=f.readlines()
 	configurations[0]=configurations[0].strip()
