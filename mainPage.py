@@ -478,12 +478,10 @@ tree2.configure(xscrollcommand=s3.set)
 # tree.tag_configure('green',background='#88CC22')
 # tree.tag_configure('white',background='white')
 # tree.tag_configure('yellow',background='#CCEE66')
-# b=ttk.Button(treeLF,text='انتخاب',command= lambda: toggleColor(1,tree.selection()))
-# b.grid(row=1,column=0,sticky='news',padx=5,pady=5)
-# b.bind('<Return>',lambda ev: toggleColor(1))
-# b2=ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0,tree.selection()))
-# b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
-# b2.bind('<Return>',lambda ev: toggleColor(0))
+b21=ttk.Button(treeLF2,text='انتخاب')
+b21.grid(row=2,column=0,sticky='news',padx=5,pady=5)
+b22=ttk.Button(treeLF2,text='لغو انتخاب')
+b22.grid(row=2,column=1,sticky='news',padx=5,pady=5)
 
 
 '''
