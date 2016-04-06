@@ -86,8 +86,8 @@ def connect(ip,e):
 			t.grab_set()
 			t.title('خطا')
 			t.columnconfigure(0,minsize='150')
-			ttk.Label(t,text='.امکان برقراری ارتباط با سرور وجود ندارد').grid(row=0,column=0,padx=50,pady=20)
-			myButton=ttk.Button(t,text='بازگشت',command= lambda: close(root,t))
+			ttk.Label(t,text='Cannot connect to server').grid(row=0,column=0,padx=50,pady=20)
+			myButton=ttk.Button(t,text='Back',command= lambda: close(root,t))
 			myButton.grid(row=1,column=0,padx=10,pady=(10,10))
 			myButton.bind('<Return>',lambda ev: close(root,t))
 
@@ -97,11 +97,11 @@ def connect(ip,e):
 		t.title('خطا')
 		t.columnconfigure(0,minsize='150')
 		t.columnconfigure(1,minsize='150')
-		ttk.Label(t,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
-		b=ttk.Button(t,text='تلاش مجدد',command= lambda: [close(root,t),e.delete(0,'end'),e.focus()])
+		ttk.Label(t,text='IP address is not valid.').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
+		b=ttk.Button(t,text='retry',command= lambda: [close(root,t),e.delete(0,'end'),e.focus()])
 		b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
 		b.bind('<Return>',lambda ev: [close(w,t),e.delete(0,'end')])
-		b2=ttk.Button(t,text='لغو',command= lambda: close(root,t))
+		b2=ttk.Button(t,text='cancel',command= lambda: close(root,t))
 		b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
 		b2.bind('<Return>',lambda ev: close(root,t))
 		b.focus()
@@ -128,10 +128,10 @@ def setDefaultIP(configurations,w):
 			updateConf(configurations)
 			t1=Toplevel(root)
 			t1.grab_set()
-			t1.title('عملیات موفقیت آمیز')
+			t1.title('Successful operation')
 			t1.columnconfigure(0,minsize='150')
-			ttk.Label(t1,text='.آی پی سرور پیش فرض با موفقیت تغییر یافت').grid(row=0,column=0,padx=50,pady=20)
-			b=ttk.Button(t1,text='تایید',command= lambda: close(root,t1))
+			ttk.Label(t1,text='Default server IP address changed sucessfully.').grid(row=0,column=0,padx=50,pady=20)
+			b=ttk.Button(t1,text='OK',command= lambda: close(root,t1))
 			b.grid(row=1,column=0,padx=10,pady=(10,10))
 			b.bind('<Return>',lambda ev: close(root,t1))
 			b.focus()
@@ -142,27 +142,27 @@ def setDefaultIP(configurations,w):
 			t1.title('خطا')
 			t1.columnconfigure(0,minsize='150')
 			t1.columnconfigure(1,minsize='150')
-			ttk.Label(t1,text='.آی پی وارد شده معتبر نمی باشد').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
-			b=ttk.Button(t1,text='تلاش مجدد',command= lambda: [close(t,t1),e.delete(0,'end'),e.focus()])
+			ttk.Label(t1,text='IP address is not valid.').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
+			b=ttk.Button(t1,text='retry',command= lambda: [close(t,t1),e.delete(0,'end'),e.focus()])
 			b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
 			b.bind('<Return>',lambda ev: [close(t,t1),e.delete(0,'end'),e.focus()])
-			b2=ttk.Button(t1,text='لغو',command= lambda: close(root,t1,t))
+			b2=ttk.Button(t1,text='cancel',command= lambda: close(root,t1,t))
 			b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
 			b2.bind('<Return>',lambda ev: close(root,t1,t))
 			b.focus()
 	close(root,w)
 	t=Toplevel(root)
 	t.grab_set() # Make parent disabled
-	t.title('ورود آی پی سرور پیش فرض')
-	ttk.Label(t,text=':لطفا آی پی سرور پیش فرض را وارد کنید').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
+	t.title('Default server ip address')
+	ttk.Label(t,text='Please enter IP address for deafault server:').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
 	ip=StringVar()
 	e=ttk.Entry(t,width=45,textvariable=ip)
 	e.grid(row=1,column=0,columnspan=2,padx=30,pady=10)
 	e.focus()
-	b=ttk.Button(t,text='تایید',command= setDefaultIPInner)
+	b=ttk.Button(t,text='OK',command= setDefaultIPInner)
 	b.grid(row=2,column=0,padx=10,pady=10,sticky='e')
 	b.bind('<Return>',setDefaultIPInner(e))
-	b2=ttk.Button(t,text='لغو',command= lambda: close(root,t))
+	b2=ttk.Button(t,text='cancel',command= lambda: close(root,t))
 	b2.grid(row=2,column=1,padx=10,pady=10,sticky='w')
 	b2.bind('<Return>',lambda ev: close(root,t))
 
@@ -285,8 +285,6 @@ def addToDB(e):
 	connection.close()
 
 
-
-
 '''
 ==========================================
 
@@ -295,7 +293,7 @@ Main Window
 ==========================================
 '''
 root=Tk()
-root.title('نرم افزار مدیریت پرینت - مرکز فناوری اطلاعات - دانشگاه صنعتی اصفهان')
+root.title('Print manager software - IT center of Isfahan university of technology')
 root.resizable(False,False)
 
 
@@ -308,7 +306,6 @@ Notebook
 '''
 nb=ttk.Notebook(root)
 nb.grid(row=0,column=0)
-ttk.Style().configure('TNotebook',tabposition='ne')
 
 
 '''
@@ -329,23 +326,21 @@ Connect section
 
 ------------------------------------------
 '''
-connectLF=ttk.Labelframe(addNewFrame,text='اتصال',width=200,height=50,labelanchor='ne')
+connectLF=ttk.Labelframe(addNewFrame,text='connect',width=200,height=50)
 connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky='news')
 connectLF.columnconfigure(0,weight=1)
-ttk.Label(connectLF,text=':نوع اتصال به سرور').grid(row=0,column=0,columnspan=2,padx=5,pady=(0,5),sticky='e')
+ttk.Label(connectLF,text='Connection type:').grid(row=0,column=0,padx=5,pady=(0,5),sticky='w')
 v=StringVar()
 v.set('default')
 ip=StringVar()
-ttk.Radiobutton(connectLF,variable=v,value='new',command= lambda: toggleEntry(v,e,ip)).grid(row=1,column=1,sticky='e')
-ttk.Radiobutton(connectLF,variable=v,value='default',command= lambda: toggleEntry(v,e,ip)).grid(row=2,column=1,sticky='e')
-ttk.Label(connectLF,text='اتصال  به سرور جدید').grid(row=1,padx=5,pady=(0,5),sticky='e')
-ttk.Label(connectLF,text='اتصال به سرور پیش فرض').grid(row=2,padx=5,pady=(0,5),sticky='e')
+ttk.Radiobutton(connectLF,text='Connect to new server',variable=v,value='new',command= lambda: toggleEntry(v,e,ip)).grid(row=1,column=0,sticky='w',padx=5)
+ttk.Radiobutton(connectLF,text='Connect to default server',variable=v,value='default',command= lambda: toggleEntry(v,e,ip)).grid(row=2,column=0,sticky='w',padx=5)
+ttk.Label(connectLF,text='IP address:').grid(row=3,column=0,padx=5,pady=5,sticky='w')
 e=ttk.Entry(connectLF,textvariable=ip)
-e.grid(row=3,sticky='we',padx=(5,50),pady=5)
+e.grid(row=3,column=0,columnspan=2,sticky='we',padx=(75,5),pady=5)
 toggleEntry(v,e,ip)
-ttk.Label(connectLF,text=':آی پی سرور').grid(row=3,column=0,columnspan=2,padx=5,pady=(0,5),sticky='e')
-b=ttk.Button(connectLF,text='اتصال',command= lambda: connect(ip,e) )
-b.grid(row=4,column=0,columnspan=2,sticky='news',padx=5,pady=5)
+b=ttk.Button(connectLF,text='Connect',command= lambda: connect(ip,e) )
+b.grid(row=4,column=0,columnspan=3,sticky='news',padx=5,pady=5)
 b.bind('<Return>',lambda ev: connect(ip,e))
 
 
@@ -356,7 +351,7 @@ Quota section
 
 ------------------------------------------
 '''
-quotaLF=ttk.Labelframe(addNewFrame,text='سهمیه',width=200,height=350,labelanchor='ne')
+quotaLF=ttk.Labelframe(addNewFrame,text='credits',width=200,height=350)
 quotaLF.grid(row=2,column=1,padx=(0,5),pady=5,sticky='news')
 quotaLF.columnconfigure(2,weight=1)
 credit=StringVar()
@@ -365,24 +360,24 @@ minCredit=StringVar()
 sheetCredit=StringVar()
 sheetMax=StringVar()
 discount=StringVar()
-ttk.Label(quotaLF,text='ریال').grid(row=0,column=0,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text='ریال').grid(row=1,column=0,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text='ریال').grid(row=2,column=0,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text='برگ').grid(row=3,column=0,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text='برگ').grid(row=4,column=0,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text='درصد').grid(row=5,column=0,padx=5,pady=(5,10),sticky='e')
+ttk.Label(quotaLF,text='rials').grid(row=0,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='rials').grid(row=1,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='rials').grid(row=2,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='sheets').grid(row=3,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='sheets').grid(row=4,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='percent').grid(row=5,column=2,padx=5,pady=(5,10),sticky='w')
 ttk.Entry(quotaLF,textvariable=credit).grid(row=0,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF,textvariable=maxCredit).grid(row=1,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF,textvariable=minCredit).grid(row=2,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF,textvariable=sheetCredit).grid(row=3,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF,textvariable=sheetMax).grid(row=4,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF,textvariable=discount).grid(row=5,column=1,padx=5,pady=(5,10))
-ttk.Label(quotaLF,text=':اعتبار').grid(row=0,column=2,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text=':حداکثر اعتبار مجاز').grid(row=1,column=2,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text=':حداقل اعتبار مجاز').grid(row=2,column=2,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text=':سهمیه ی کاغذ').grid(row=3,column=2,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text=':حداکثر سهمیه ی کاغذ مجاز').grid(row=4,column=2,padx=5,pady=5,sticky='e')
-ttk.Label(quotaLF,text=':تخفیف').grid(row=5,column=2,padx=5,pady=(5,10),sticky='e')
+ttk.Label(quotaLF,text='credit:').grid(row=0,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='max permitted credit:').grid(row=1,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='min permitted credit:').grid(row=2,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='sheet credit:').grid(row=3,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='max permitted sheet credit:').grid(row=4,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='discount:').grid(row=5,column=0,padx=5,pady=(5,10),sticky='w')
 
 
 '''
@@ -392,7 +387,7 @@ Result tree section
 
 ------------------------------------------
 '''
-treeLF=ttk.Labelframe(addNewFrame,text='نتیجه ی جستجو',labelanchor='ne')
+treeLF=ttk.Labelframe(addNewFrame,text='search results')
 treeLF.grid(row=0,column=0,rowspan=3,padx=5,pady=5,sticky='news')
 treeLF.rowconfigure(0,weight=1)
 tree=ttk.Treeview(treeLF)
@@ -403,10 +398,10 @@ tree.configure(yscrollcommand=s.set)
 tree.tag_configure('green',background='#88CC22')
 tree.tag_configure('white',background='white')
 tree.tag_configure('yellow',background='#CCEE66')
-b=ttk.Button(treeLF,text='انتخاب',command= lambda: toggleColor(1,tree.selection()))
+b=ttk.Button(treeLF,text='Select',command= lambda: toggleColor(1,tree.selection()))
 b.grid(row=1,column=0,sticky='news',padx=5,pady=5)
 b.bind('<Return>',lambda ev: toggleColor(1))
-b2=ttk.Button(treeLF,text='لغو انتخاب',command= lambda: toggleColor(0,tree.selection()))
+b2=ttk.Button(treeLF,text='Deselect',command= lambda: toggleColor(0,tree.selection()))
 b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
 b2.bind('<Return>',lambda ev: toggleColor(0))
 
@@ -418,7 +413,7 @@ Add to database button
 
 ------------------------------------------
 '''
-addB=ttk.Button(addNewFrame,text='افزودن موارد انتخابی',command=addToDB)
+addB=ttk.Button(addNewFrame,text='Add selected entries',command=addToDB)
 addB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
 addB.bind('<Return>',addToDB)
 
@@ -434,9 +429,9 @@ root.option_add('*tearOff', FALSE)
 menubar=Menu(root)
 root.configure(menu=menubar)
 menu1 = Menu(menubar)
-menubar.add_cascade(menu=menu1, label='منو')
-menu1.add_command(label='تنظیمات')
-menu1.add_command(label='درباره')
+menubar.add_cascade(menu=menu1, label='menu')
+menu1.add_command(label='settings')
+menu1.add_command(label='about')
 
 
 '''
@@ -449,16 +444,17 @@ entries
 '''
 updateFrame=ttk.Frame(nb)
 updateFrame.grid(row=0,column=0)
+updateFrame.columnconfigure(1,weight=1)
 
 
 '''
 ------------------------------------------
 
-Result tree section
+Result tree section 2
 
 ------------------------------------------
 '''
-treeLF2=ttk.Labelframe(updateFrame,text='نتیجه ی جستجو',labelanchor='ne')
+treeLF2=ttk.Labelframe(updateFrame,text='Search result')
 treeLF2.grid(row=0,column=0,rowspan=3,padx=5,pady=5,sticky='news')
 treeLF2.rowconfigure(0,weight=1)
 tree2=ttk.Treeview(treeLF2,columns=['Grade','Department'])
@@ -478,10 +474,32 @@ tree2.configure(xscrollcommand=s3.set)
 # tree.tag_configure('green',background='#88CC22')
 # tree.tag_configure('white',background='white')
 # tree.tag_configure('yellow',background='#CCEE66')
-b21=ttk.Button(treeLF2,text='انتخاب')
+b21=ttk.Button(treeLF2,text='select')
 b21.grid(row=2,column=0,sticky='news',padx=5,pady=5)
-b22=ttk.Button(treeLF2,text='لغو انتخاب')
+b22=ttk.Button(treeLF2,text='deselect')
 b22.grid(row=2,column=1,sticky='news',padx=5,pady=5)
+
+
+'''
+------------------------------------------
+
+Connect section 2
+
+------------------------------------------
+'''
+connectLF2=ttk.Labelframe(updateFrame,text='connect',width=200,height=50)
+connectLF2.grid(row=0,column=1,padx=(0,5),pady=5,sticky='news')
+connectLF2.columnconfigure(0,weight=1)
+connectLF2.rowconfigure(0,weight=1)
+b2=ttk.Button(connectLF2,text='connect')
+b2.grid(row=0,column=0,sticky='ew',padx=5,pady=5)
+# b2.bind('<Return>',lambda ev: connect(ip,e))
+ttk.Combobox(connectLF2,values=[''],state='readonly').grid(row=1,column=0)
+ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
+ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
+ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
+ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
+ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
 
 
 '''
@@ -491,8 +509,8 @@ Adding frames to notebook
 
 ------------------------------------------
 '''
-nb.add(updateFrame,text='به روزرسانی کاربران')
-nb.add(addNewFrame,text='افزودن کاربر جدید')
+nb.add(addNewFrame,text='Update existing users')
+nb.add(updateFrame,text='Add new users')
 
 
 '''
@@ -538,12 +556,12 @@ with open('conf') as f:
 		t=Toplevel(root)
 		t.grab_set()
 		t.focus()
-		t.title('تغییر آی پی سرور پیش فرض')
-		ttk.Label(t,text='آی پی سرور پیش فرض 127.0.0.1 تنظیم شده است. آیا می خواهید آن را تغییر دهید؟').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
-		y=ttk.Button(t,text='بله',command= lambda: setDefaultIP(configurations,t))
+		t.title('Default server IP address modification')
+		ttk.Label(t,text='Default server IP address is set to 127.0.0.1. Do you want to change it?').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
+		y=ttk.Button(t,text='yes',command= lambda: setDefaultIP(configurations,t))
 		y.grid(row=2,column=0,padx=10,pady=10,sticky='e')
 		y.bind('<Return>',lambda ev: setDefaultIP(configurations,t))
-		n=ttk.Button(t,text='خیر',command= lambda: close(root,t))
+		n=ttk.Button(t,text='no',command= lambda: close(root,t))
 		n.grid(row=2,column=1,padx=10,pady=10,sticky='w')
 		n.bind('<Return>',lambda ev: close(root,t))
 
