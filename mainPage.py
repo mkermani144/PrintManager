@@ -94,14 +94,14 @@ def connect(ip,e):
 	else:
 		t=Toplevel(root)
 		t.grab_set()
-		t.title('خطا')
+		t.title('Error')
 		t.columnconfigure(0,minsize='150')
 		t.columnconfigure(1,minsize='150')
 		ttk.Label(t,text='IP address is not valid.').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
-		b=ttk.Button(t,text='retry',command= lambda: [close(root,t),e.delete(0,'end'),e.focus()])
+		b=ttk.Button(t,text='Retry',command= lambda: [close(root,t),e.delete(0,'end'),e.focus()])
 		b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
 		b.bind('<Return>',lambda ev: [close(w,t),e.delete(0,'end')])
-		b2=ttk.Button(t,text='cancel',command= lambda: close(root,t))
+		b2=ttk.Button(t,text='Cancel',command= lambda: close(root,t))
 		b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
 		b2.bind('<Return>',lambda ev: close(root,t))
 		b.focus()
@@ -139,14 +139,14 @@ def setDefaultIP(configurations,w):
 		else:
 			t1=Toplevel(t)
 			t1.grab_set()
-			t1.title('خطا')
+			t1.title('Error')
 			t1.columnconfigure(0,minsize='150')
 			t1.columnconfigure(1,minsize='150')
 			ttk.Label(t1,text='IP address is not valid.').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
-			b=ttk.Button(t1,text='retry',command= lambda: [close(t,t1),e.delete(0,'end'),e.focus()])
+			b=ttk.Button(t1,text='Retry',command= lambda: [close(t,t1),e.delete(0,'end'),e.focus()])
 			b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
 			b.bind('<Return>',lambda ev: [close(t,t1),e.delete(0,'end'),e.focus()])
-			b2=ttk.Button(t1,text='cancel',command= lambda: close(root,t1,t))
+			b2=ttk.Button(t1,text='Cancel',command= lambda: close(root,t1,t))
 			b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
 			b2.bind('<Return>',lambda ev: close(root,t1,t))
 			b.focus()
@@ -162,7 +162,7 @@ def setDefaultIP(configurations,w):
 	b=ttk.Button(t,text='OK',command= setDefaultIPInner)
 	b.grid(row=2,column=0,padx=10,pady=10,sticky='e')
 	b.bind('<Return>',setDefaultIPInner(e))
-	b2=ttk.Button(t,text='cancel',command= lambda: close(root,t))
+	b2=ttk.Button(t,text='Cancel',command= lambda: close(root,t))
 	b2.grid(row=2,column=1,padx=10,pady=10,sticky='w')
 	b2.bind('<Return>',lambda ev: close(root,t))
 
@@ -293,7 +293,7 @@ Main Window
 ==========================================
 '''
 root=Tk()
-root.title('Print manager software - IT center of Isfahan university of technology')
+root.title('Print manager software - Isfahan university of technology IT center')
 root.resizable(False,False)
 
 
@@ -326,7 +326,7 @@ Connect section
 
 ------------------------------------------
 '''
-connectLF=ttk.Labelframe(addNewFrame,text='connect',width=200,height=50)
+connectLF=ttk.Labelframe(addNewFrame,text='Connect',width=200,height=50)
 connectLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky='news')
 connectLF.columnconfigure(0,weight=1)
 ttk.Label(connectLF,text='Connection type:').grid(row=0,column=0,padx=5,pady=(0,5),sticky='w')
@@ -351,7 +351,7 @@ Quota section
 
 ------------------------------------------
 '''
-quotaLF=ttk.Labelframe(addNewFrame,text='credits',width=200,height=350)
+quotaLF=ttk.Labelframe(addNewFrame,text='Credits',width=200,height=350)
 quotaLF.grid(row=2,column=1,padx=(0,5),pady=5,sticky='news')
 quotaLF.columnconfigure(2,weight=1)
 credit=StringVar()
@@ -372,12 +372,12 @@ ttk.Entry(quotaLF,textvariable=minCredit).grid(row=2,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF,textvariable=sheetCredit).grid(row=3,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF,textvariable=sheetMax).grid(row=4,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF,textvariable=discount).grid(row=5,column=1,padx=5,pady=(5,10))
-ttk.Label(quotaLF,text='credit:').grid(row=0,column=0,padx=5,pady=5,sticky='w')
-ttk.Label(quotaLF,text='max permitted credit:').grid(row=1,column=0,padx=5,pady=5,sticky='w')
-ttk.Label(quotaLF,text='min permitted credit:').grid(row=2,column=0,padx=5,pady=5,sticky='w')
-ttk.Label(quotaLF,text='sheet credit:').grid(row=3,column=0,padx=5,pady=5,sticky='w')
-ttk.Label(quotaLF,text='max permitted sheet credit:').grid(row=4,column=0,padx=5,pady=5,sticky='w')
-ttk.Label(quotaLF,text='discount:').grid(row=5,column=0,padx=5,pady=(5,10),sticky='w')
+ttk.Label(quotaLF,text='Credit:').grid(row=0,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='Max permitted credit:').grid(row=1,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='Min permitted credit:').grid(row=2,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='Sheet credit:').grid(row=3,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='Max permitted sheet credit:').grid(row=4,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF,text='Discount:').grid(row=5,column=0,padx=5,pady=(5,10),sticky='w')
 
 
 '''
@@ -387,7 +387,7 @@ Result tree section
 
 ------------------------------------------
 '''
-treeLF=ttk.Labelframe(addNewFrame,text='search results')
+treeLF=ttk.Labelframe(addNewFrame,text='Search results')
 treeLF.grid(row=0,column=0,rowspan=3,padx=5,pady=5,sticky='news')
 treeLF.rowconfigure(0,weight=1)
 tree=ttk.Treeview(treeLF)
@@ -474,9 +474,9 @@ tree2.configure(xscrollcommand=s3.set)
 # tree.tag_configure('green',background='#88CC22')
 # tree.tag_configure('white',background='white')
 # tree.tag_configure('yellow',background='#CCEE66')
-b21=ttk.Button(treeLF2,text='select')
+b21=ttk.Button(treeLF2,text='Select')
 b21.grid(row=2,column=0,sticky='news',padx=5,pady=5)
-b22=ttk.Button(treeLF2,text='deselect')
+b22=ttk.Button(treeLF2,text='Deselect')
 b22.grid(row=2,column=1,sticky='news',padx=5,pady=5)
 
 
@@ -487,19 +487,27 @@ Connect section 2
 
 ------------------------------------------
 '''
-connectLF2=ttk.Labelframe(updateFrame,text='connect',width=200,height=50)
+connectLF2=ttk.Labelframe(updateFrame,text='Connect',width=200,height=50)
 connectLF2.grid(row=0,column=1,padx=(0,5),pady=5,sticky='news')
-connectLF2.columnconfigure(0,weight=1)
-connectLF2.rowconfigure(0,weight=1)
-b2=ttk.Button(connectLF2,text='connect')
-b2.grid(row=0,column=0,sticky='ew',padx=5,pady=5)
+connectLF2.columnconfigure(1,weight=1)
 # b2.bind('<Return>',lambda ev: connect(ip,e))
-ttk.Combobox(connectLF2,values=[''],state='readonly').grid(row=1,column=0)
-ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
-ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
-ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
-ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
-ttk.Combobox(connectLF2,values=['hello','hhh'],state='readonly').grid(row=1,column=0)
+ttk.Label(connectLF2,text='Grade:').grid(row=0,column=0,padx=(50,5),pady=5,sticky='w')
+ttk.Label(connectLF2,text='Department:').grid(row=1,column=0,padx=(50,5),pady=5,sticky='w')
+ttk.Label(connectLF2,text='Entrance year:').grid(row=2,column=0,padx=(50,5),pady=5,sticky='w')
+grade=StringVar()
+department=StringVar()
+entranceYear=StringVar()
+grades=['all','bs','ms','phd']
+departments=['all','ECE','Mechanical']
+entranceYears=['all']
+grade.set(grades[0])
+department.set(departments[0])
+entranceYear.set(entranceYears[0])
+ttk.Combobox(connectLF2,textvariable=grade,values=grades,state='readonly').grid(row=0,column=1,padx=(5,50),pady=5,sticky='we')
+ttk.Combobox(connectLF2,textvariable=department,values=departments,state='readonly').grid(row=1,column=1,padx=(5,50),pady=5,sticky='we')
+ttk.Combobox(connectLF2,textvariable=entranceYear,values=entranceYears).grid(row=2,column=1,padx=(5,50),pady=5,sticky='we')
+b2=ttk.Button(connectLF2,text='Connect')
+b2.grid(row=3,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
 
 
 '''
@@ -558,10 +566,10 @@ with open('conf') as f:
 		t.focus()
 		t.title('Default server IP address modification')
 		ttk.Label(t,text='Default server IP address is set to 127.0.0.1. Do you want to change it?').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
-		y=ttk.Button(t,text='yes',command= lambda: setDefaultIP(configurations,t))
+		y=ttk.Button(t,text='Yes',command= lambda: setDefaultIP(configurations,t))
 		y.grid(row=2,column=0,padx=10,pady=10,sticky='e')
 		y.bind('<Return>',lambda ev: setDefaultIP(configurations,t))
-		n=ttk.Button(t,text='no',command= lambda: close(root,t))
+		n=ttk.Button(t,text='No',command= lambda: close(root,t))
 		n.grid(row=2,column=1,padx=10,pady=10,sticky='w')
 		n.bind('<Return>',lambda ev: close(root,t))
 
