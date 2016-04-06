@@ -341,11 +341,11 @@ ttk.Label(connectLF,text='IP address:').grid(row=3,column=0,padx=5,pady=5,sticky
 e=ttk.Entry(connectLF,textvariable=ip)
 e.grid(row=3,column=0,columnspan=2,sticky='we',padx=(75,5),pady=5)
 toggleEntry(v,e,ip)
-connectLabel=ttk.Label(connectLF,text='You are not connected to a server.',foreground='red')
-connectLabel.grid(row=5,column=0,columnspan=3,padx=5,pady=5)
 b=ttk.Button(connectLF,text='Connect',command= lambda: connect(ip,e) )
 b.grid(row=4,column=0,columnspan=3,sticky='news',padx=5,pady=5)
 b.bind('<Return>',lambda ev: connect(ip,e))
+connectLabel=ttk.Label(connectLF,text='You are not connected to a server.',foreground='red')
+connectLabel.grid(row=5,column=0,columnspan=3,padx=5,pady=5)
 
 
 '''
@@ -487,17 +487,17 @@ b22.grid(row=2,column=1,sticky='news',padx=5,pady=5)
 '''
 ------------------------------------------
 
-Connect section 2
+Select entries section
 
 ------------------------------------------
 '''
-connectLF2=ttk.Labelframe(updateFrame,text='Connect',width=200,height=50)
-connectLF2.grid(row=0,column=1,padx=(0,5),pady=5,sticky='news')
-connectLF2.columnconfigure(1,weight=1)
+selectEntriesLF=ttk.Labelframe(updateFrame,text='Select Entries',width=200,height=50)
+selectEntriesLF.grid(row=0,column=1,padx=(0,5),pady=5,sticky='news')
+selectEntriesLF.columnconfigure(1,weight=1)
 # b2.bind('<Return>',lambda ev: connect(ip,e))
-ttk.Label(connectLF2,text='Grade:').grid(row=0,column=0,padx=(50,5),pady=5,sticky='w')
-ttk.Label(connectLF2,text='Department:').grid(row=1,column=0,padx=(50,5),pady=5,sticky='w')
-ttk.Label(connectLF2,text='Entrance year:').grid(row=2,column=0,padx=(50,5),pady=5,sticky='w')
+ttk.Label(selectEntriesLF,text='Grade:').grid(row=0,column=0,padx=(50,5),pady=5,sticky='w')
+ttk.Label(selectEntriesLF,text='Department:').grid(row=1,column=0,padx=(50,5),pady=5,sticky='w')
+ttk.Label(selectEntriesLF,text='Entrance year:').grid(row=2,column=0,padx=(50,5),pady=5,sticky='w')
 grade=StringVar()
 department=StringVar()
 entranceYear=StringVar()
@@ -507,11 +507,13 @@ entranceYears=['all']
 grade.set(grades[0])
 department.set(departments[0])
 entranceYear.set(entranceYears[0])
-ttk.Combobox(connectLF2,textvariable=grade,values=grades,state='readonly').grid(row=0,column=1,padx=(5,50),pady=5,sticky='we')
-ttk.Combobox(connectLF2,textvariable=department,values=departments,state='readonly').grid(row=1,column=1,padx=(5,50),pady=5,sticky='we')
-ttk.Combobox(connectLF2,textvariable=entranceYear,values=entranceYears).grid(row=2,column=1,padx=(5,50),pady=5,sticky='we')
-b2=ttk.Button(connectLF2,text='Connect')
+ttk.Combobox(selectEntriesLF,textvariable=grade,values=grades,state='readonly').grid(row=0,column=1,padx=(5,50),pady=5,sticky='we')
+ttk.Combobox(selectEntriesLF,textvariable=department,values=departments,state='readonly').grid(row=1,column=1,padx=(5,50),pady=5,sticky='we')
+ttk.Combobox(selectEntriesLF,textvariable=entranceYear,values=entranceYears).grid(row=2,column=1,padx=(5,50),pady=5,sticky='we')
+b2=ttk.Button(selectEntriesLF,text='Select')
 b2.grid(row=3,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
+selectLabel=ttk.Label(selectEntriesLF,text='You are not selected any entries.',foreground='red')
+selectLabel.grid(row=4,column=0,columnspan=3,padx=5,pady=5)
 
 
 '''
@@ -569,8 +571,8 @@ Adding frames to notebook
 
 ------------------------------------------
 '''
-nb.add(addNewFrame,text='Update existing users')
-nb.add(updateFrame,text='Add new users')
+nb.add(addNewFrame,text='Add new users')
+nb.add(updateFrame,text='Update existing users')
 
 
 '''
