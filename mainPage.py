@@ -465,9 +465,9 @@ tree2=ttk.Treeview(treeLF2,columns=['Grade','Department'])
 tree2.heading('#0', text='Name')
 tree2.heading('#1', text='Grade')
 tree2.heading('#2', text='Department')
-tree2.column('#0',width=100)
-tree2.column('#1',width=50)
-tree2.column('#2',width=50)
+tree2.column('#0',minwidth=100,width=100)
+tree2.column('#1',minwidth=50,width=50)
+tree2.column('#2',minwidth=50,width=50)
 tree2.grid(row=0,column=0,columnspan=2,pady=(5,0),sticky='nws')
 s2=ttk.Scrollbar(treeLF2,orient=VERTICAL,command=tree2.yview)
 s2.grid(row=0,column=2,pady=(5,0),sticky='ns')
@@ -512,6 +512,42 @@ ttk.Combobox(connectLF2,textvariable=department,values=departments,state='readon
 ttk.Combobox(connectLF2,textvariable=entranceYear,values=entranceYears).grid(row=2,column=1,padx=(5,50),pady=5,sticky='we')
 b2=ttk.Button(connectLF2,text='Connect')
 b2.grid(row=3,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
+
+
+'''
+------------------------------------------
+
+Quota section
+
+------------------------------------------
+'''
+quotaLF2=ttk.Labelframe(updateFrame,text='Credits',width=200,height=350)
+quotaLF2.grid(row=2,column=1,padx=(0,5),pady=5,sticky='news')
+quotaLF2.columnconfigure(2,weight=1)
+credit2=StringVar()
+maxCredit2=StringVar()
+minCredit2=StringVar()
+sheetCredit2=StringVar()
+sheetMax2=StringVar()
+discount2=StringVar()
+ttk.Label(quotaLF2,text='rials').grid(row=0,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='rials').grid(row=1,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='rials').grid(row=2,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='sheets').grid(row=3,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='sheets').grid(row=4,column=2,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='percent').grid(row=5,column=2,padx=5,pady=(5,10),sticky='w')
+ttk.Entry(quotaLF2,textvariable=credit2).grid(row=0,column=1,padx=5,pady=5)
+ttk.Entry(quotaLF2,textvariable=maxCredit2).grid(row=1,column=1,padx=5,pady=5)
+ttk.Entry(quotaLF2,textvariable=minCredit2).grid(row=2,column=1,padx=5,pady=5)
+ttk.Entry(quotaLF2,textvariable=sheetCredit).grid(row=3,column=1,padx=5,pady=5)
+ttk.Entry(quotaLF2,textvariable=sheetMax2).grid(row=4,column=1,padx=5,pady=5)
+ttk.Entry(quotaLF2,textvariable=discount2).grid(row=5,column=1,padx=5,pady=(5,10))
+ttk.Label(quotaLF2,text='Credit:').grid(row=0,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='Max permitted credit:').grid(row=1,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='Min permitted credit:').grid(row=2,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='Sheet credit:').grid(row=3,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='Max permitted sheet credit:').grid(row=4,column=0,padx=5,pady=5,sticky='w')
+ttk.Label(quotaLF2,text='Discount:').grid(row=5,column=0,padx=5,pady=(5,10),sticky='w')
 
 
 '''
