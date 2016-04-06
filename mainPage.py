@@ -3,6 +3,7 @@ from tkinter import ttk
 from re import match
 from ldap3 import *
 import pypyodbc
+import time
 
 
 '''
@@ -81,6 +82,7 @@ def connect(ip,e):
 				except:
 					pass
 			connection.unbind()
+			connectLabel.configure(text='Successfully connected to server.',foreground='green')
 		except:
 			t=Toplevel(root)
 			t.grab_set()
@@ -339,6 +341,8 @@ ttk.Label(connectLF,text='IP address:').grid(row=3,column=0,padx=5,pady=5,sticky
 e=ttk.Entry(connectLF,textvariable=ip)
 e.grid(row=3,column=0,columnspan=2,sticky='we',padx=(75,5),pady=5)
 toggleEntry(v,e,ip)
+connectLabel=ttk.Label(connectLF,text='You are not connected to a server.',foreground='red')
+connectLabel.grid(row=5,column=0,columnspan=3,padx=5,pady=5)
 b=ttk.Button(connectLF,text='Connect',command= lambda: connect(ip,e) )
 b.grid(row=4,column=0,columnspan=3,sticky='news',padx=5,pady=5)
 b.bind('<Return>',lambda ev: connect(ip,e))
