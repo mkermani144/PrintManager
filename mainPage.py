@@ -517,7 +517,7 @@ b2.grid(row=3,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
 '''
 ------------------------------------------
 
-Quota section
+Quota section 2
 
 ------------------------------------------
 '''
@@ -548,6 +548,18 @@ ttk.Label(quotaLF2,text='Min permitted credit:').grid(row=2,column=0,padx=5,pady
 ttk.Label(quotaLF2,text='Sheet credit:').grid(row=3,column=0,padx=5,pady=5,sticky='w')
 ttk.Label(quotaLF2,text='Max permitted sheet credit:').grid(row=4,column=0,padx=5,pady=5,sticky='w')
 ttk.Label(quotaLF2,text='Discount:').grid(row=5,column=0,padx=5,pady=(5,10),sticky='w')
+
+
+'''
+------------------------------------------
+
+Update database button
+
+------------------------------------------
+'''
+addB=ttk.Button(updateFrame,text='Update selected entries')
+addB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
+# addB.bind('<Return>',addToDB)
 
 
 '''
