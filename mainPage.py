@@ -61,7 +61,7 @@ def connect(ip,e):
 			tree.insert('',0,text='salon.iut',iid='DC=salon,DC=iut',tags='white')
 			connection.search(search_base='dc=salon,dc=iut',
 				search_filter='(objectClass=organizationalUnit)',
-				search_scope=SUBTREE,)
+				search_scope=SUBTREE)
 			connection.entries.sort()
 			i=0
 			for entry in connection.entries:
@@ -246,12 +246,18 @@ def toggleColor(type,flag,l):
 Function to add selected result tree
 entries to the database
 
->>> e:  Event object.
-
 ++++++++++++++++++++++++++++++++++++++++++
 '''
-def addToDB(e):
+def addToDB():
 	pass
+	if not (credit.get().isdigit() and maxCredit.get().isdigit() and minCredit.get().isdigit()
+			and sheetCredit.get().isdigit() and sheetMax.get().isdigit() and discount.get().isdigit()):
+			messagebox.showerror(title='Invalid input',
+			message='Some of the entries of credits section are not valid.')
+	# selectionIIDs=[x for x in tree.tag_has('green') if not tree.get_children(x)]
+	# selection=[tree.item(x,text) for x in selectionIIDs]
+	# for item in selection:
+
 
 
 '''
@@ -610,8 +616,8 @@ Adding frames to notebook
 
 ------------------------------------------
 '''
-nb.add(addNewFrame,text='Add new users')
-nb.add(updateFrame,text='Update existing users')
+nb.add(addNewFrame,text=' Add new users ')
+nb.add(updateFrame,text=' Update existing users ')
 
 
 '''
