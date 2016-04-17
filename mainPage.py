@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from tkinter import ttk
 from re import match
 from ldap3 import *
@@ -84,29 +85,13 @@ def connect(ip,e):
 			connection.unbind()
 			connectLabel.configure(text='Successfully connected to server.',foreground='green')
 		except:
-			t=Toplevel(root)
-			t.grab_set()
-			t.title('Connection error')
-			t.columnconfigure(0,minsize='150')
-			ttk.Label(t,text='Cannot connect to server').grid(row=0,column=0,padx=50,pady=20)
-			myButton=ttk.Button(t,text='Back',command= lambda: close(root,t))
-			myButton.grid(row=1,column=0,padx=10,pady=(10,10))
-			myButton.bind('<Return>',lambda ev: close(root,t))
+			messagebox.showerror(title='Connection error',message='Cannot connect to server')
 
 	else:
-		t=Toplevel(root)
-		t.grab_set()
-		t.title('IP address error')
-		t.columnconfigure(0,minsize='150')
-		t.columnconfigure(1,minsize='150')
-		ttk.Label(t,text='IP address is not valid.').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
-		b=ttk.Button(t,text='Retry',command= lambda: [close(root,t),e.delete(0,'end'),e.focus()])
-		b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
-		b.bind('<Return>',lambda ev: [close(w,t),e.delete(0,'end')])
-		b2=ttk.Button(t,text='Cancel',command= lambda: close(root,t))
-		b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
-		b2.bind('<Return>',lambda ev: close(root,t))
-		b.focus()
+		flag=messagebox.askretrycancel(title='IP address invalidation',message='IP address is not valid.',icon='error')
+		if flag:
+			e.delete(0,'end')
+			e.focus()
 
 
 '''
@@ -123,36 +108,17 @@ server from user and set it to the file
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
-def setDefaultIP(configurations,w):
+def setDefaultIP(configurations):
 	def setDefaultIPInner():
 		if validateIP(ip):
 			configurations[0]=ip.get()
 			updateConf(configurations)
-			t1=Toplevel(root)
-			t1.grab_set()
-			t1.title('Successful operation')
-			t1.columnconfigure(0,minsize='150')
-			ttk.Label(t1,text='Default server IP address changed sucessfully.').grid(row=0,column=0,padx=50,pady=20)
-			b=ttk.Button(t1,text='OK',command= lambda: close(root,t1))
-			b.grid(row=1,column=0,padx=10,pady=(10,10))
-			b.bind('<Return>',lambda ev: close(root,t1))
-			b.focus()
-			close(t1,t)
+			messagebox.showinfo(title='Successful operation',message='Default server IP address changed sucessfully.')
 		else:
-			t1=Toplevel(t)
-			t1.grab_set()
-			t1.title('IP address error')
-			t1.columnconfigure(0,minsize='150')
-			t1.columnconfigure(1,minsize='150')
-			ttk.Label(t1,text='IP address is not valid.').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
-			b=ttk.Button(t1,text='Retry',command= lambda: [close(t,t1),e.delete(0,'end'),e.focus()])
-			b.grid(row=1,column=0,padx=10,pady=(10,10),sticky='e')
-			b.bind('<Return>',lambda ev: [close(t,t1),e.delete(0,'end'),e.focus()])
-			b2=ttk.Button(t1,text='Cancel',command= lambda: close(root,t1,t))
-			b2.grid(row=1,column=1,padx=10,pady=(10,10),sticky='w')
-			b2.bind('<Return>',lambda ev: close(root,t1,t))
-			b.focus()
-	close(root,w)
+			flag=messagebox.askretrycancel(title='IP address invalidation',message='IP address is not valid.',icon='error')
+			if flag:
+				e.delete(0,'end')
+				e.focus()
 	t=Toplevel(root)
 	t.grab_set() # Make parent disabled
 	t.title('Default server ip address')
@@ -163,10 +129,10 @@ def setDefaultIP(configurations,w):
 	e.focus()
 	b=ttk.Button(t,text='OK',command= setDefaultIPInner)
 	b.grid(row=2,column=0,padx=10,pady=10,sticky='e')
-	b.bind('<Return>',setDefaultIPInner(e))
+	# b.bind('<Return>',setDefaultIPInner(e))
 	b2=ttk.Button(t,text='Cancel',command= lambda: close(root,t))
 	b2.grid(row=2,column=1,padx=10,pady=10,sticky='w')
-	b2.bind('<Return>',lambda ev: close(root,t))
+	# b2.bind('<Return>',lambda ev: close(root,t))
 
 
 '''
@@ -292,17 +258,20 @@ on entry values
 ++++++++++++++++++++++++++++++++++++++++++
 '''
 def fetchFromDB(grade,department,entranceYear):
-	conn=pypyodbc.win_connect_mdb('C:\database.mdb')
-	cur=conn.cursor()
-	query='''
-		  SELECT * FROM credits WHERE
-		  grade=%s AND
-		  department=%s AND
-		  entrance_year=%s
-		  ''' % (grade,department,entranceYear)
-	cur.execute(query)
-	for row in cur.description:
-		tree.insert('',0,text=row[0]+row[1],iid=row[0]+column[0],tag='white')
+	try:
+		conn=pypyodbc.win_connect_mdb('C:\database.mdb')
+		cur=conn.cursor()
+		query='''
+			  SELECT * FROM credits WHERE
+			  grade=%s AND
+			  department=%s AND
+			  entrance_year=%s
+			  ''' % (grade,department,entranceYear)
+		cur.execute(query)
+		for row in cur.description:
+			tree.insert('',0,text=row[0]+row[1],iid=row[0]+column[0],tag='white')
+	except:
+		pass
 
 
 
@@ -648,16 +617,9 @@ with open('conf') as f:
 		cur.close()
 		conn.commit()
 		conn.close()
-		t=Toplevel(root)
-		t.grab_set()
-		t.focus()
-		t.title('Default server IP address modification')
-		ttk.Label(t,text='Default server IP address is set to 127.0.0.1. Do you want to change it?').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
-		y=ttk.Button(t,text='Yes',command= lambda: setDefaultIP(configurations,t))
-		y.grid(row=2,column=0,padx=10,pady=10,sticky='e')
-		y.bind('<Return>',lambda ev: setDefaultIP(configurations,t))
-		n=ttk.Button(t,text='No',command= lambda: close(root,t))
-		n.grid(row=2,column=1,padx=10,pady=10,sticky='w')
-		n.bind('<Return>',lambda ev: close(root,t))
+		flag=messagebox.askyesno(message='Default server IP address is set to 127.0.0.1. Do you want to change it?',
+									icon='question',title='Default IP modification')
+		if flag:
+			setDefaultIP(configurations)
 
 root.mainloop()
