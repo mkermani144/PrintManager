@@ -222,39 +222,44 @@ entries when they are selected/deselected
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
-def toggleColor(flag,l):
-	def toggleFatherColor(entry):
-		p=tree.parent(entry)
-		if p:
-			tree.item(p,tags=[w.replace(state[0],'yellow') for w in tree.item(p)['tags']])
-			l=[tree.item(x)['tags'] for x in tree.get_children(p)]
-			if(flag==1):
-				for child in l:
-					if 'yellow' in child or 'white' in child:
-						break;
+def toggleColor(type,flag,l):
+	if type=='complex':
+		def toggleFatherColor(entry):
+			p=tree.parent(entry)
+			if p:
+				tree.item(p,tags=[w.replace(state[0],'yellow') for w in tree.item(p)['tags']])
+				l=[tree.item(x)['tags'] for x in tree.get_children(p)]
+				if(flag==1):
+					for child in l:
+						if 'yellow' in child or 'white' in child:
+							break;
+					else:
+						tree.item(p,tags=[w.replace('yellow','green') for w in tree.item(p)['tags']])
 				else:
-					tree.item(p,tags=[w.replace('yellow','green') for w in tree.item(p)['tags']])
-			else:
-				for child in l:
-					if 'yellow' in child or 'green' in child:
-						break;
-				else:
-					tree.item(p,tags=[w.replace('yellow','white') for w in tree.item(p)['tags']])
-			toggleFatherColor(tree.parent(entry))
-	def toggleChildColor(entry):
-		for e in tree.get_children(entry):
-			tree.item(e,tags=[w.replace(state[0],state[1]) for w in tree.item(e)['tags']])
-			tree.item(e,tags=[w.replace('yellow',state[1]) for w in tree.item(e)['tags']])
-			toggleChildColor(e)
+					for child in l:
+						if 'yellow' in child or 'green' in child:
+							break;
+					else:
+						tree.item(p,tags=[w.replace('yellow','white') for w in tree.item(p)['tags']])
+				toggleFatherColor(tree.parent(entry))
+		def toggleChildColor(entry):
+			for e in tree.get_children(entry):
+				tree.item(e,tags=[w.replace(state[0],state[1]) for w in tree.item(e)['tags']])
+				tree.item(e,tags=[w.replace('yellow',state[1]) for w in tree.item(e)['tags']])
+				toggleChildColor(e)
 
-	state=('white','green') if flag==1 else ('green','white')
-	for entry in l:
-		tree.item(entry,tags=[w.replace(state[0],state[1]) for w in tree.item(entry)['tags']])
-		tree.item(entry,tags=[w.replace('yellow',state[1]) for w in tree.item(entry)['tags']])
-		toggleFatherColor(entry)
-		toggleChildColor(entry)
+		state=('white','green') if flag==1 else ('green','white')
+		for entry in l:
+			tree.item(entry,tags=[w.replace(state[0],state[1]) for w in tree.item(entry)['tags']])
+			tree.item(entry,tags=[w.replace('yellow',state[1]) for w in tree.item(entry)['tags']])
+			toggleFatherColor(entry)
+			toggleChildColor(entry)
 
-	tree.selection_set(tuple())
+		tree.selection_set(tuple())
+	else:
+		state=('white','green') if flag==1 else ('green','white')
+		for entry in l:
+			tree.item(entry,tags=[w.replace(state[0],state[1]) for w in tree.item(entry)['tags']])
 
 
 '''
@@ -430,13 +435,10 @@ tree.configure(yscrollcommand=s.set)
 tree.tag_configure('green',background='#88CC22')
 tree.tag_configure('white',background='white')
 tree.tag_configure('yellow',background='#CCEE66')
-b=ttk.Button(treeLF,text='Select',command= lambda: toggleColor(1,tree.selection()))
+b=ttk.Button(treeLF,text='Select',command= lambda: toggleColor('complex',1,tree.selection()))
 b.grid(row=1,column=0,sticky='news',padx=5,pady=5)
-b.bind('<Return>',lambda ev: toggleColor(1))
-b2=ttk.Button(treeLF,text='Deselect',command= lambda: toggleColor(0,tree.selection()))
+b2=ttk.Button(treeLF,text='Deselect',command= lambda: toggleColor('complex',0,tree.selection()))
 b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
-b2.bind('<Return>',lambda ev: toggleColor(0))
-
 
 '''
 ------------------------------------------
