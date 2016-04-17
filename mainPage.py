@@ -13,7 +13,7 @@ import time
 Function to destroy widgets passed to it
 excluding the first one
 
->>> *args : All of the widgets to be
+>>> *args:  All of the widgets to be
 			destroyed and the widget to be
 			kept.
 
@@ -31,7 +31,7 @@ def close(*args):
 
 Function to see if the IP is valid
 
->>> ip : The IP to be validated.
+>>> ip:  The IP to be validated.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -45,8 +45,8 @@ def validateIP(ip):
 Function to connect to the LDAP server and
 to make the result tree
 
->>> ip : The IP of the LDAP server.
->>> e : Entry of above IP.
+>>> ip:  The IP of the LDAP server.
+>>> e:   Entry of above IP.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -100,11 +100,12 @@ def connect(ip,e):
 Function to get the default IP of the
 server from user and set it to the file
 
->>> configurations : A list containing
+>>> configurations:  A list containing
 					 configurations of
 					 the program.
->>> w : Popup widget asking the user if he
-		wants to change default ip.
+>>> w:  			 Popup widget asking
+					 the user if he wants
+					 to change default ip.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -141,9 +142,10 @@ def setDefaultIP(configurations):
 Function to toggle between two radio
 buttons
 
->>> rbv : Radio button variable indicating
-		  state of radio buttons.
->>> entry : Entry of the IP address.
+>>> rbv:  	Radio button variable
+			indicating state of radio
+			buttons.
+>>> entry:  Entry of the IP address.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -162,7 +164,7 @@ def toggleEntry(rbv,entry,ip):
 
 Function to update the conf file
 
->>> configuration : List contaning
+>>> configuration:  List contaning
 					configurations of the
 					program.
 
@@ -180,11 +182,14 @@ def updateConf(configurations):
 Function to toggle color of result tree
 entries when they are selected/deselected
 
->>> flag : Flag indicating if the entry
+>>> type:  String indicating if function
+		   call type should be simple or
+		   complex.
+>>> flag:  Flag indicating if the entry
 		   should be disabled/enabled.
->>> l : List containing all of result tree
-		entries whose colors should be
-		toggled
+>>> l:     List containing all of result
+		   tree entries whose colors
+		   should be toggled.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -234,7 +239,7 @@ def toggleColor(type,flag,l):
 Function to add selected result tree
 entries to the database
 
->>> e : Event object.
+>>> e:  Event object.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -248,11 +253,11 @@ def addToDB(e):
 Function to fetch data from database based
 on entry values
 
->>> grade : Grade of students to be
-			fetched.
->>> department : department of students to
-				be fetched.
->>> entranceYear : Entrance year of
+>>> grade:  	   Grade of students to be
+				   fetched.
+>>> department:    department of students to
+				   be fetched.
+>>> entranceYear:  Entrance year of
 				   students to be fetched.
 
 ++++++++++++++++++++++++++++++++++++++++++
@@ -284,7 +289,7 @@ def fetchFromDB(grade,department,entranceYear):
 Function to update selected result tree
 entries
 
->>> e : Event object.
+>>> e:  Event object.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
