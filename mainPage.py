@@ -261,12 +261,15 @@ def fetchFromDB(grade,department,entranceYear):
 	try:
 		conn=pypyodbc.win_connect_mdb('C:\database.mdb')
 		cur=conn.cursor()
-		query='''
-			  SELECT * FROM credits WHERE
-			  grade=%s AND
-			  department=%s AND
-			  entrance_year=%s
-			  ''' % (grade,department,entranceYear)
+		query='SELECT * FROM credits'
+		if grade!='all' or department!='all' or entranceYear!='all':
+			query+=' WHERE'
+		if grade!='all':
+			query+=' grade=%s' % grade
+		if department!='all':
+			query+=' AND department=%s' % department
+		if entranceYear!='all':
+			query+=' AND entrance_year=%s' % entranceYear
 		cur.execute(query)
 		for row in cur.description:
 			tree.insert('',0,text=row[0]+row[1],iid=row[0]+column[0],tag='white')
