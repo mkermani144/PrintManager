@@ -84,6 +84,13 @@ def connect(ip,e):
 					pass
 			connection.unbind()
 			connectLabel.configure(text='Successfully connected to server.',foreground='green')
+			quotaLF.state(['!disabled'])
+			for widget in quotaLF.winfo_children():
+				widget.state(['!disabled'])
+			treeLF.state(['!disabled'])
+			for widget in treeLF.winfo_children():
+				widget.state(['!disabled'])
+			addB.state(['!disabled'])
 		except:
 			messagebox.showerror(title='Connection error',message='Cannot connect to server')
 
@@ -278,6 +285,13 @@ def fetchFromDB(grade,department,entranceYear):
 		cur.execute(query)
 		for row in cur.description:
 			tree.insert('',0,text=row[0]+row[1],iid=row[0]+column[0],tag='white')
+		quotaLF2.state(['!disabled'])
+		for widget in quotaLF.winfo_children():
+			widget.state(['!disabled'])
+		treeLF2.state(['!disabled'])
+		for widget in treeLF.winfo_children():
+			widget.state(['!disabled'])
+		updateB.state(['!disabled'])
 	except:
 		pass
 
@@ -392,6 +406,9 @@ ttk.Label(quotaLF,text='Min permitted credit:').grid(row=2,column=0,padx=5,pady=
 ttk.Label(quotaLF,text='Sheet credit:').grid(row=3,column=0,padx=5,pady=5,sticky='w')
 ttk.Label(quotaLF,text='Max permitted sheet credit:').grid(row=4,column=0,padx=5,pady=5,sticky='w')
 ttk.Label(quotaLF,text='Discount:').grid(row=5,column=0,padx=5,pady=(5,10),sticky='w')
+quotaLF.state(['disabled'])
+for widget in quotaLF.winfo_children():
+	widget.state(['disabled'])
 
 
 '''
@@ -416,6 +433,10 @@ b=ttk.Button(treeLF,text='Select',command= lambda: toggleColor('complex',1,tree.
 b.grid(row=1,column=0,sticky='news',padx=5,pady=5)
 b2=ttk.Button(treeLF,text='Deselect',command= lambda: toggleColor('complex',0,tree.selection()))
 b2.grid(row=1,column=1,sticky='news',padx=5,pady=5)
+treeLF.state(['disabled'])
+for widget in treeLF.winfo_children():
+	widget.state(['disabled'])
+
 
 '''
 ------------------------------------------
@@ -427,6 +448,7 @@ Add to database button
 addB=ttk.Button(addNewFrame,text='Add selected entries',command=addToDB)
 addB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
 addB.bind('<Return>',addToDB)
+addB.state(['disabled'])
 
 
 '''
@@ -489,6 +511,9 @@ b21=ttk.Button(treeLF2,text='Select',command= lambda: toggleColor('simple',1,tre
 b21.grid(row=2,column=0,sticky='news',padx=5,pady=5)
 b22=ttk.Button(treeLF2,text='Deselect',command= lambda: toggleColor('simple',0,tree2.selection()))
 b22.grid(row=2,column=1,sticky='news',padx=5,pady=5)
+treeLF2.state(['disabled'])
+for widget in treeLF2.winfo_children():
+	widget.state(['disabled'])
 
 
 '''
@@ -560,6 +585,9 @@ ttk.Label(quotaLF2,text='Min permitted credit:').grid(row=2,column=0,padx=5,pady
 ttk.Label(quotaLF2,text='Sheet credit:').grid(row=3,column=0,padx=5,pady=5,sticky='w')
 ttk.Label(quotaLF2,text='Max permitted sheet credit:').grid(row=4,column=0,padx=5,pady=5,sticky='w')
 ttk.Label(quotaLF2,text='Discount:').grid(row=5,column=0,padx=5,pady=(5,10),sticky='w')
+quotaLF2.state(['disabled'])
+for widget in quotaLF2.winfo_children():
+	widget.state(['disabled'])
 
 
 '''
@@ -569,8 +597,9 @@ Update database button
 
 ------------------------------------------
 '''
-addB=ttk.Button(updateFrame,text='Update selected entries')
-addB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
+updateB=ttk.Button(updateFrame,text='Update selected entries')
+updateB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
+updateB.state(['disabled'])
 # addB.bind('<Return>',addToDB)
 
 
