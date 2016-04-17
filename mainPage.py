@@ -86,7 +86,7 @@ def connect(ip,e):
 		except:
 			t=Toplevel(root)
 			t.grab_set()
-			t.title('خطا')
+			t.title('Connection error')
 			t.columnconfigure(0,minsize='150')
 			ttk.Label(t,text='Cannot connect to server').grid(row=0,column=0,padx=50,pady=20)
 			myButton=ttk.Button(t,text='Back',command= lambda: close(root,t))
@@ -96,7 +96,7 @@ def connect(ip,e):
 	else:
 		t=Toplevel(root)
 		t.grab_set()
-		t.title('Error')
+		t.title('IP address error')
 		t.columnconfigure(0,minsize='150')
 		t.columnconfigure(1,minsize='150')
 		ttk.Label(t,text='IP address is not valid.').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
@@ -141,7 +141,7 @@ def setDefaultIP(configurations,w):
 		else:
 			t1=Toplevel(t)
 			t1.grab_set()
-			t1.title('Error')
+			t1.title('IP address error')
 			t1.columnconfigure(0,minsize='150')
 			t1.columnconfigure(1,minsize='150')
 			ttk.Label(t1,text='IP address is not valid.').grid(row=0,column=0,columnspan=2,padx=50,pady=20)
@@ -268,23 +268,51 @@ entries to the database
 ++++++++++++++++++++++++++++++++++++++++++
 '''
 def addToDB(e):
-	MDB = 'db.mdb'
-	DRV = '{Microsoft Access Driver (*.mdb)}'
-	# PWD = 'mypassword'
-	connection = pyodbc.connect('DRIVER={};DBQ={}'.format(DRV,MDB))
-	cursor=connection.cursor()
-	selectionIIDs=tree.tag_has('green')
-	for item in selectionIIDs:
-		SQ='''
-		IF NOT EXISTS(SELECT * from db WHERE firstName=%s AND lastName=%s AND studentNumber=%s)
-		 BEGIN
-		  INSERT INTO db VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-		 END
-		''' % (item['cn'], item['sn'], item['studentNumber'],item['cn'], item['sn'], item['studentNumber']),
-		credit.get(),maxCredit.get(),minCredit.get(),sheetCredit.get(),sheetMax.get(),discount.get()
-		cursor.execute(SQ)
-	cursor.close()
-	connection.close()
+	pass
+
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to fetch data from database based
+on entry values
+
+>>> grade : Grade of students to be
+			fetched.
+>>> department : department of students to
+				be fetched.
+>>> entranceYear : Entrance year of
+				   students to be fetched.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
+def fetchFromDB(grade,department,entranceYear):
+	conn=pypyodbc.win_connect_mdb('C:\database.mdb')
+	cur=conn.cursor()
+	query='''
+		  SELECT * FROM credits WHERE
+		  grade=%s AND
+		  department=%s AND
+		  entrance_year=%s
+		  ''' % (grade,department,entranceYear)
+	cur.execute(query)
+	for row in cur.description:
+		tree.insert('',0,text=row[0]+row[1],iid=row[0]+column[0],tag='white')
+
+
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to update selected result tree
+entries
+
+>>> e : Event object.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
+def updateDB(e):
+	pass
 
 
 '''
@@ -344,7 +372,7 @@ toggleEntry(v,e,ip)
 b=ttk.Button(connectLF,text='Connect',command= lambda: connect(ip,e) )
 b.grid(row=4,column=0,columnspan=3,sticky='news',padx=5,pady=5)
 b.bind('<Return>',lambda ev: connect(ip,e))
-connectLabel=ttk.Label(connectLF,text='You are not connected to a server.',foreground='red')
+connectLabel=ttk.Label(connectLF,text='You are not connected to any server.',foreground='red')
 connectLabel.grid(row=5,column=0,columnspan=3,padx=5,pady=5)
 
 
@@ -513,9 +541,9 @@ entranceYear.set(entranceYears[0])
 ttk.Combobox(selectEntriesLF,textvariable=grade,values=grades,state='readonly').grid(row=0,column=1,padx=(5,50),pady=5,sticky='we')
 ttk.Combobox(selectEntriesLF,textvariable=department,values=departments,state='readonly').grid(row=1,column=1,padx=(5,50),pady=5,sticky='we')
 ttk.Combobox(selectEntriesLF,textvariable=entranceYear,values=entranceYears).grid(row=2,column=1,padx=(5,50),pady=5,sticky='we')
-b2=ttk.Button(selectEntriesLF,text='Select')
+b2=ttk.Button(selectEntriesLF,text='Fetch',command= lambda: fetchFromDB(grade,department,entranceYear))
 b2.grid(row=3,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
-selectLabel=ttk.Label(selectEntriesLF,text='You are not selected any entries.',foreground='red')
+selectLabel=ttk.Label(selectEntriesLF,text='You have not fetched any entries.',foreground='red')
 selectLabel.grid(row=4,column=0,columnspan=3,padx=5,pady=5)
 
 
