@@ -56,6 +56,7 @@ def connect(ip,e):
 		username='cn=administrator,cn=users,dc=salon,dc=iut'
 		password='Server2014'
 		connection=Connection(server,username,password,read_only=True)
+		usersDictionary={}
 		try:
 			connection.bind()
 			tree.insert('',0,text='salon.iut',iid='DC=salon,DC=iut',tags='white')
@@ -72,13 +73,14 @@ def connect(ip,e):
 			connection.search(search_base='dc=salon,dc=iut',
 				search_filter='(objectClass=user)',
 				search_scope=SUBTREE,
-				attributes=['cn','sn','studentNumber'])
+				attributes=['givenName','sn','cn','department','description'])
 			connection.entries.sort()
 			i=0
 			for entry in connection.entries:
 				dn=entry.entry_get_dn()
 				try:
 					tree.insert(dn[dn.find(',')+1:],i,text=entry['cn'],iid=dn,tags='white')
+					usersDictionary[entry['cn']]=entry.entry_get_attributes_dict()
 					i+=1
 				except:
 					pass
@@ -249,15 +251,41 @@ entries to the database
 ++++++++++++++++++++++++++++++++++++++++++
 '''
 def addToDB():
-	pass
 	if not (credit.get().isdigit() and maxCredit.get().isdigit() and minCredit.get().isdigit()
 			and sheetCredit.get().isdigit() and sheetMax.get().isdigit() and discount.get().isdigit()):
 			messagebox.showerror(title='Invalid input',
 			message='Some of the entries of credits section are not valid.')
-	# selectionIIDs=[x for x in tree.tag_has('green') if not tree.get_children(x)]
-	# selection=[tree.item(x,text) for x in selectionIIDs]
-	# for item in selection:
-
+	selectionIIDs=[x for x in tree.tag_has('green') if not tree.get_children(x)]
+	selection=[tree.item(x,text) for x in selectionIIDs]
+	i=0
+	j=0
+	for item in selection:
+		query='''
+			INSERT INTO credits
+			VALUES
+			("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s")
+		''' % usersDictionary[item]['givenName'],usersDictionary[item]['sn'],usersDictionary[item]['cn'][:2],
+		usersDictionary[item]['cn'],usersDictionary[item]['description'].split()[2],
+		usersDictionary[item]['department'],usersDictionary[item]['description'].split()[1],
+		credit,maxCredit,minCredit,sheetCredit,sheetMax,discount
+		checkQuery='SELECT * FROM credits WHERE student_number=%s' % item['cn']
+		conn=pypyodbc.win_connect_mdb('C:\database.mdb')
+		cur=conn.cursor()
+		cur.execute(checkQuery)
+		if not len(cur.description):
+			i+=1
+			cur.execute(query)
+		else:
+			j+=1
+		if i==0:
+			messagebox.showinfo(title='Successful operation',
+								message='All of the selected entries exist in the database. No entry added to database.')
+		elif j==0:
+			messagebox.showinfo(title='Successful operation',
+								message='All of the selected entries added to database.')
+		else:
+			messagebox.showinfo(title='Successful operation',
+								message=str(i)+' entries of '+str(i+j)+' entry added to database.')
 
 
 '''
@@ -314,7 +342,10 @@ entries
 ++++++++++++++++++++++++++++++++++++++++++
 '''
 def updateDB(e):
-	pass
+	if not (credit2.get().isdigit() and maxCredit2.get().isdigit() and minCredit2.get().isdigit()
+			and sheetCredit2.get().isdigit() and sheetMax2.get().isdigit() and discount2.get().isdigit()):
+			messagebox.showerror(title='Invalid input',
+			message='Some of the entries of credits section are not valid.')
 
 
 '''
@@ -643,16 +674,16 @@ with open('conf') as f:
 			(
 				first_name VARCHAR(30),
 				last_name VARCHAR(30),
-				entrance_year INTEGER,
-				student_number INTEGER,
+				entrance_year VARCHAR(2),
+				student_number VARCHAR(7),
 				grade VARCHAR(3),
 				department VARCHAR(15),
 				field VARCHAR(15),
-				credit INTEGER,
-				max_credit INTEGER,
-				min_credit INTEGER,
-				paper_credit INTEGER,
-				paper_max_credit INTEGER,
+				credit VARCHAR(7),
+				max_credit VARCHAR(10),
+				min_credit VARCHAR(10),
+				paper_credit VARCHAR(6),
+				paper_max_credit VARCHAR(6),
 				discount VARCHAR(3)
 			)
 		'''
