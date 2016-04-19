@@ -56,6 +56,7 @@ def connect(ip,e):
 		username='cn=administrator,cn=users,dc=salon,dc=iut'
 		password='Server2014'
 		connection=Connection(server,username,password,read_only=True)
+		global usersDictionary
 		usersDictionary={}
 		try:
 			connection.bind()
@@ -263,12 +264,12 @@ def addToDB():
 		query='''
 			INSERT INTO credits
 			VALUES
-			("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s")
+			("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s");
 		''' % usersDictionary[item]['givenName'],usersDictionary[item]['sn'],usersDictionary[item]['cn'][:2],
 		usersDictionary[item]['cn'],usersDictionary[item]['description'].split()[2],
 		usersDictionary[item]['department'],usersDictionary[item]['description'].split()[1],
 		credit,maxCredit,minCredit,sheetCredit,sheetMax,discount
-		checkQuery='SELECT * FROM credits WHERE student_number=%s' % item['cn']
+		checkQuery='SELECT * FROM credits WHERE student_number="%s";' % item['cn']
 		conn=pypyodbc.win_connect_mdb('C:\database.mdb')
 		cur=conn.cursor()
 		cur.execute(checkQuery)
@@ -311,14 +312,18 @@ def fetchFromDB(grade,department,entranceYear):
 		if grade!='all' or department!='all' or entranceYear!='all':
 			query+=' WHERE'
 		if grade!='all':
-			query+=' grade=%s' % grade
+			query+=' grade="%s"' % grade
 		if department!='all':
-			query+=' AND department=%s' % department
+			query+=' AND department="%s"' % department
 		if entranceYear!='all':
-			query+=' AND entrance_year=%s' % entranceYear
+			query+=' AND entrance_year="%s"' % entranceYear
+		query+=';'
+		global usersStdnums
+		usersStdnums={};
 		cur.execute(query)
 		for row in cur.description:
 			tree.insert('',0,text=row[0]+row[1],iid=row[0]+column[0],tag='white')
+			usersStdnums[row[0]+column[0]]=row[3]
 		quotaLF2.state(['!disabled'])
 		for widget in quotaLF.winfo_children():
 			widget.state(['!disabled'])
@@ -346,6 +351,26 @@ def updateDB(e):
 			and sheetCredit2.get().isdigit() and sheetMax2.get().isdigit() and discount2.get().isdigit()):
 			messagebox.showerror(title='Invalid input',
 			message='Some of the entries of credits section are not valid.')
+	selectionIIDs=[x for x in tree.tag_has('green') if not tree.get_children(x)]
+	selection=[tree.item(x,text) for x in selectionIIDs]
+	for item in selection:
+		query='''
+			UPDATE credits
+			SET
+			credit="%s",
+			max_credit="%s",
+			min_credit="%s",
+			paper_credit="%s",
+			paper_max_credit="%s",
+			discount="%s"
+			WHERE
+			student_number="%s";
+		''' % credit2,maxCredit2,minCredit2,sheetCredit2,sheetMax2,discount2,usersStdnums[item]
+		conn=pypyodbc.win_connect_mdb('C:\database.mdb')
+		cur=conn.cursor()
+		cur.execute(checkQuery)
+		messagebox.showinfo(title='Successful operation',
+							message='All of the selected entries updated.')
 
 
 '''
