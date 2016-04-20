@@ -240,7 +240,8 @@ def toggleColor(type,flag,l):
 	else:
 		state=('white','green') if flag==1 else ('green','white')
 		for entry in l:
-			tree.item(entry,tags=[w.replace(state[0],state[1]) for w in tree.item(entry)['tags']])
+			tree2.item(entry,tags=[w.replace(state[0],state[1]) for w in tree2.item(entry)['tags']])
+		tree2.selection_set(tuple())
 
 
 '''
@@ -270,7 +271,7 @@ def addToDB():
 		usersDictionary[item]['department'],usersDictionary[item]['description'].split()[1],
 		credit,maxCredit,minCredit,sheetCredit,sheetMax,discount
 		checkQuery='SELECT * FROM credits WHERE student_number="%s";' % item['cn']
-		conn=pypyodbc.win_connect_mdb('C:\database.mdb')
+		conn=pypyodbc.win_connect_mdb('database.mdb')
 		cur=conn.cursor()
 		cur.execute(checkQuery)
 		if not len(cur.description):
@@ -306,31 +307,34 @@ on entry values
 '''
 def fetchFromDB(grade,department,entranceYear):
 	try:
-		conn=pypyodbc.win_connect_mdb('C:\database.mdb')
+		conn=pypyodbc.win_connect_mdb('database.mdb')
 		cur=conn.cursor()
 		query='SELECT * FROM credits'
-		if grade!='all' or department!='all' or entranceYear!='all':
+		if grade.get()!='all' or department.get()!='all' or entranceYear.get()!='all':
 			query+=' WHERE'
-		if grade!='all':
-			query+=' grade="%s"' % grade
-		if department!='all':
-			query+=' AND department="%s"' % department
-		if entranceYear!='all':
-			query+=' AND entrance_year="%s"' % entranceYear
+		if grade.get()!='all':
+			query+=" grade='%s'" % grade.get()
+		if department.get()!='all':
+			query+=" AND department='%s'" % department.get()
+		if entranceYear.get()!='all':
+			query+=" AND entrance_year='%s'" % entranceYear.get()
 		query+=';'
 		global usersStdnums
-		usersStdnums={};
+		usersStdnums={}
 		cur.execute(query)
-		for row in cur.description:
-			tree.insert('',0,text=row[0]+row[1],iid=row[0]+column[0],tag='white')
-			usersStdnums[row[0]+column[0]]=row[3]
-		quotaLF2.state(['!disabled'])
-		for widget in quotaLF.winfo_children():
-			widget.state(['!disabled'])
-		treeLF2.state(['!disabled'])
-		for widget in treeLF.winfo_children():
-			widget.state(['!disabled'])
-		updateB.state(['!disabled'])
+		data=cur.fetchall().copy()
+		if data:
+			selectLabel.configure(text='Successfully fetched data from database.',foreground='green')
+			for row in data:
+				tree2.insert('',0,text=row[0]+' '+row[1],iid=row[0]+' '+row[1],tag='white')
+				usersStdnums[row[0]+' '+row[1]]=row[3]
+			quotaLF2.state(['!disabled'])
+			for widget in quotaLF2.winfo_children():
+				widget.state(['!disabled'])
+			treeLF2.state(['!disabled'])
+			for widget in treeLF2.winfo_children():
+				widget.state(['!disabled'])
+			updateB.state(['!disabled'])
 	except:
 		pass
 
@@ -366,7 +370,7 @@ def updateDB(e):
 			WHERE
 			student_number="%s";
 		''' % credit2,maxCredit2,minCredit2,sheetCredit2,sheetMax2,discount2,usersStdnums[item]
-		conn=pypyodbc.win_connect_mdb('C:\database.mdb')
+		conn=pypyodbc.win_connect_mdb('database.mdb')
 		cur=conn.cursor()
 		cur.execute(checkQuery)
 		messagebox.showinfo(title='Successful operation',
@@ -552,14 +556,11 @@ Result tree section 2
 treeLF2=ttk.Labelframe(updateFrame,text='Search result')
 treeLF2.grid(row=0,column=0,rowspan=3,padx=5,pady=5,sticky='news')
 treeLF2.rowconfigure(0,weight=1)
-tree2=ttk.Treeview(treeLF2,columns=['Grade','Department'])
+tree2=ttk.Treeview(treeLF2)
 tree2.heading('#0', text='Name')
-tree2.heading('#1', text='Grade')
-tree2.heading('#2', text='Department')
-tree2.column('#0',minwidth=100,width=100)
-tree2.column('#1',minwidth=50,width=50)
-tree2.column('#2',minwidth=50,width=50)
 tree2.grid(row=0,column=0,columnspan=2,pady=(5,0),sticky='nws')
+tree2.tag_configure('green',background='#88CC22')
+tree2.tag_configure('white',background='white')
 s2=ttk.Scrollbar(treeLF2,orient=VERTICAL,command=tree2.yview)
 s2.grid(row=0,column=2,pady=(5,0),sticky='ns')
 tree2.configure(yscrollcommand=s2.set)
