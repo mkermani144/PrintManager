@@ -259,39 +259,43 @@ def addToDB():
 			message='Some of the entries of credits section are not valid.')
 	selectionIIDs=[x for x in tree.tag_has('green') if not tree.get_children(x)]
 	selection=[tree.item(x) for x in selectionIIDs]
-	i=0
-	j=0
-	for item in selection:
-		checkQuery="SELECT * FROM credits WHERE student_number='%s';" % item['cn']
-		conn=pypyodbc.win_connect_mdb('database.mdb')
-		cur=conn.cursor()
-		cur.execute(checkQuery)
-		if not len(cur.description):
-			i+=1
-			query='''
-				INSERT INTO credits
-				VALUES
-				('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s');
-			''' % usersDictionary[item]['givenName'],usersDictionary[item]['sn'],usersDictionary[item]['cn'][:2],
-			usersDictionary[item]['cn'],usersDictionary[item]['description'].split()[2],
-			usersDictionary[item]['department'],usersDictionary[item]['description'].split()[1],
-			credit.get(),maxCredit.get(),minCredit.get(),
-			sheetCredit.get(),sheetMax.get(),discount.get()
-			cur.execute(query)
+	if selection:
+		i=0
+		j=0
+		for item in selection:
+			checkQuery="SELECT * FROM credits WHERE student_number='%s';" % item['cn']
+			conn=pypyodbc.win_connect_mdb('database.mdb')
+			cur=conn.cursor()
+			cur.execute(checkQuery)
+			if not len(cur.description):
+				i+=1
+				query='''
+					INSERT INTO credits
+					VALUES
+					('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s');
+				''' % usersDictionary[item]['givenName'],usersDictionary[item]['sn'],usersDictionary[item]['cn'][:2],
+				usersDictionary[item]['cn'],usersDictionary[item]['description'].split()[2],
+				usersDictionary[item]['department'],usersDictionary[item]['description'].split()[1],
+				credit.get(),maxCredit.get(),minCredit.get(),
+				sheetCredit.get(),sheetMax.get(),discount.get()
+				cur.execute(query)
+			else:
+				j+=1
+		cur.commit()
+		cur.close()
+		conn.close()
+		if i==0:
+			messagebox.showinfo(title='Successful operation',
+								message='All of the selected entries exist in the database. No entry added to database.')
+		elif j==0:
+			messagebox.showinfo(title='Successful operation',
+								message='All of the selected entries added to database.')
 		else:
-			j+=1
-	cur.commit()
-	cur.close()
-	conn.close()
-	if i==0:
-		messagebox.showinfo(title='Successful operation',
-							message='All of the selected entries exist in the database. No entry added to database.')
-	elif j==0:
-		messagebox.showinfo(title='Successful operation',
-							message='All of the selected entries added to database.')
+			messagebox.showinfo(title='Successful operation',
+								message=str(i)+' entries of '+str(i+j)+' entry added to database.')
 	else:
-		messagebox.showinfo(title='Successful operation',
-							message=str(i)+' entries of '+str(i+j)+' entry added to database.')
+		messagebox.showinfo(title='Empty selection',
+							message='No one of the entries selected. Please select at least one.')
 
 
 '''
@@ -373,29 +377,32 @@ def updateDB():
 				message='Some of the entries of credits section are not valid.')
 	else:
 		selectionIIDs=[x for x in tree2.tag_has('green') if not tree2.get_children(x)]
-		selection=[x for x in selectionIIDs]
-		for item in selection:
-			query='''
-				UPDATE credits
-				SET
-				credit='%s',
-				max_credit='%s',
-				min_credit='%s',
-				paper_credit='%s',
-				paper_max_credit='%s',
-				discount='%s'
-				WHERE
-				student_number='%s';
-			''' % (credit2.get(),maxCredit2.get(),minCredit2.get(),sheetCredit2.get(),
-			sheetMax2.get(),discount2.get(),usersStdnums[item])
-			conn=pypyodbc.win_connect_mdb('database.mdb')
-			cur=conn.cursor()
-			cur.execute(query)
-			cur.commit()
-			cur.close()
-			conn.close()
-			messagebox.showinfo(title='Successful operation',
-								message='All of the selected entries updated.')
+		if selectionIIDs:
+			for item in selectionIIDs:
+				query='''
+					UPDATE credits
+					SET
+					credit='%s',
+					max_credit='%s',
+					min_credit='%s',
+					paper_credit='%s',
+					paper_max_credit='%s',
+					discount='%s'
+					WHERE
+					student_number='%s';
+				''' % (credit2.get(),maxCredit2.get(),minCredit2.get(),sheetCredit2.get(),
+				sheetMax2.get(),discount2.get(),usersStdnums[item])
+				conn=pypyodbc.win_connect_mdb('database.mdb')
+				cur=conn.cursor()
+				cur.execute(query)
+				cur.commit()
+				cur.close()
+				conn.close()
+				messagebox.showinfo(title='Successful operation',
+									message='All of the selected entries updated.')
+		else:
+			messagebox.showinfo(title='Empty selection',
+								message='No one of the entries selected. Please select at least one.')
 
 
 '''
