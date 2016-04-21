@@ -344,6 +344,9 @@ def fetchFromDB(grade,department,entranceYear):
 			for widget in treeLF2.winfo_children():
 				widget.state(['!disabled'])
 			updateB.state(['!disabled'])
+		else:
+			messagebox.showinfo(title='No result',
+								message='The database returned no result.')
 	except:
 		pass
 
