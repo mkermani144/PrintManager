@@ -310,14 +310,23 @@ def fetchFromDB(grade,department,entranceYear):
 		conn=pypyodbc.win_connect_mdb('database.mdb')
 		cur=conn.cursor()
 		query='SELECT * FROM credits'
+		needsAnd=False
 		if grade.get()!='all' or department.get()!='all' or entranceYear.get()!='all':
 			query+=' WHERE'
 		if grade.get()!='all':
+			needsAnd=True
 			query+=" grade='%s'" % grade.get()
 		if department.get()!='all':
-			query+=" AND department='%s'" % department.get()
+			if needsAnd:
+				query+=" AND department='%s'" % department.get()
+			else:
+				query+=" department='%s'" % department.get()
+			needsAnd=True
 		if entranceYear.get()!='all':
-			query+=" AND entrance_year='%s'" % entranceYear.get()
+			if needsAnd:
+				query+=" AND entrance_year='%s'" % entranceYear.get()
+			else:
+				query+=" entrance_year='%s'" % entranceYear.get()
 		query+=';'
 		global usersStdnums
 		usersStdnums={}
