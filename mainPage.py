@@ -68,7 +68,7 @@ def connect(ip,e):
 			i=0
 			for entry in connection.entries:
 				dn=entry.entry_get_dn()
-				tree.insert(dn[dn.find(',')+1:],i,text=dn[dn.find('=')+1:dn.find(',')],iid=dn,tags='white')
+				tree.insert(dn[dn.find(',')+1:],i,text=entry['givenName']+' '+entry['sn'],iid=dn,tags='white')
 				i+=1
 
 			connection.search(search_base='dc=salon,dc=iut',
@@ -258,36 +258,40 @@ def addToDB():
 			messagebox.showerror(title='Invalid input',
 			message='Some of the entries of credits section are not valid.')
 	selectionIIDs=[x for x in tree.tag_has('green') if not tree.get_children(x)]
-	selection=[tree.item(x,text) for x in selectionIIDs]
+	selection=[tree.item(x) for x in selectionIIDs]
 	i=0
 	j=0
 	for item in selection:
-		query='''
-			INSERT INTO credits
-			VALUES
-			("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s");
-		''' % usersDictionary[item]['givenName'],usersDictionary[item]['sn'],usersDictionary[item]['cn'][:2],
-		usersDictionary[item]['cn'],usersDictionary[item]['description'].split()[2],
-		usersDictionary[item]['department'],usersDictionary[item]['description'].split()[1],
-		credit,maxCredit,minCredit,sheetCredit,sheetMax,discount
-		checkQuery='SELECT * FROM credits WHERE student_number="%s";' % item['cn']
+		checkQuery="SELECT * FROM credits WHERE student_number='%s';" % item['cn']
 		conn=pypyodbc.win_connect_mdb('database.mdb')
 		cur=conn.cursor()
 		cur.execute(checkQuery)
 		if not len(cur.description):
 			i+=1
+			query='''
+				INSERT INTO credits
+				VALUES
+				('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s');
+			''' % usersDictionary[item]['givenName'],usersDictionary[item]['sn'],usersDictionary[item]['cn'][:2],
+			usersDictionary[item]['cn'],usersDictionary[item]['description'].split()[2],
+			usersDictionary[item]['department'],usersDictionary[item]['description'].split()[1],
+			credit.get(),maxCredit.get(),minCredit.get(),
+			sheetCredit.get(),sheetMax.get(),discount.get()
 			cur.execute(query)
 		else:
 			j+=1
-		if i==0:
-			messagebox.showinfo(title='Successful operation',
-								message='All of the selected entries exist in the database. No entry added to database.')
-		elif j==0:
-			messagebox.showinfo(title='Successful operation',
-								message='All of the selected entries added to database.')
-		else:
-			messagebox.showinfo(title='Successful operation',
-								message=str(i)+' entries of '+str(i+j)+' entry added to database.')
+	cur.commit()
+	cur.close()
+	conn.close()
+	if i==0:
+		messagebox.showinfo(title='Successful operation',
+							message='All of the selected entries exist in the database. No entry added to database.')
+	elif j==0:
+		messagebox.showinfo(title='Successful operation',
+							message='All of the selected entries added to database.')
+	else:
+		messagebox.showinfo(title='Successful operation',
+							message=str(i)+' entries of '+str(i+j)+' entry added to database.')
 
 
 '''
@@ -335,7 +339,7 @@ def fetchFromDB(grade,department,entranceYear):
 		if data:
 			selectLabel.configure(text='Successfully fetched data from database.',foreground='green')
 			for row in data:
-				tree2.insert('',0,text=row[0]+' '+row[1],iid=row[0]+' '+row[1],tag='white')
+				tree2.insert('',0,text=row[0]+' '+row[1],iid=row[0]+' '+row[1],tag='green')
 				usersStdnums[row[0]+' '+row[1]]=row[3]
 			quotaLF2.state(['!disabled'])
 			for widget in quotaLF2.winfo_children():
