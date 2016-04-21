@@ -362,31 +362,36 @@ entries
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
-def updateDB(e):
+def updateDB():
 	if not (credit2.get().isdigit() and maxCredit2.get().isdigit() and minCredit2.get().isdigit()
 			and sheetCredit2.get().isdigit() and sheetMax2.get().isdigit() and discount2.get().isdigit()):
-			messagebox.showerror(title='Invalid input',
-			message='Some of the entries of credits section are not valid.')
-	selectionIIDs=[x for x in tree.tag_has('green') if not tree.get_children(x)]
-	selection=[tree.item(x,text) for x in selectionIIDs]
-	for item in selection:
-		query='''
-			UPDATE credits
-			SET
-			credit="%s",
-			max_credit="%s",
-			min_credit="%s",
-			paper_credit="%s",
-			paper_max_credit="%s",
-			discount="%s"
-			WHERE
-			student_number="%s";
-		''' % credit2,maxCredit2,minCredit2,sheetCredit2,sheetMax2,discount2,usersStdnums[item]
-		conn=pypyodbc.win_connect_mdb('database.mdb')
-		cur=conn.cursor()
-		cur.execute(checkQuery)
-		messagebox.showinfo(title='Successful operation',
-							message='All of the selected entries updated.')
+				messagebox.showerror(title='Invalid input',
+				message='Some of the entries of credits section are not valid.')
+	else:
+		selectionIIDs=[x for x in tree2.tag_has('green') if not tree2.get_children(x)]
+		selection=[x for x in selectionIIDs]
+		for item in selection:
+			query='''
+				UPDATE credits
+				SET
+				credit='%s',
+				max_credit='%s',
+				min_credit='%s',
+				paper_credit='%s',
+				paper_max_credit='%s',
+				discount='%s'
+				WHERE
+				student_number='%s';
+			''' % (credit2.get(),maxCredit2.get(),minCredit2.get(),sheetCredit2.get(),
+			sheetMax2.get(),discount2.get(),usersStdnums[item])
+			conn=pypyodbc.win_connect_mdb('database.mdb')
+			cur=conn.cursor()
+			cur.execute(query)
+			cur.commit()
+			cur.close()
+			conn.close()
+			messagebox.showinfo(title='Successful operation',
+								message='All of the selected entries updated.')
 
 
 '''
@@ -651,7 +656,7 @@ ttk.Label(quotaLF2,text='percent').grid(row=5,column=2,padx=5,pady=(5,10),sticky
 ttk.Entry(quotaLF2,textvariable=credit2).grid(row=0,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF2,textvariable=maxCredit2).grid(row=1,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF2,textvariable=minCredit2).grid(row=2,column=1,padx=5,pady=5)
-ttk.Entry(quotaLF2,textvariable=sheetCredit).grid(row=3,column=1,padx=5,pady=5)
+ttk.Entry(quotaLF2,textvariable=sheetCredit2).grid(row=3,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF2,textvariable=sheetMax2).grid(row=4,column=1,padx=5,pady=5)
 ttk.Entry(quotaLF2,textvariable=discount2).grid(row=5,column=1,padx=5,pady=(5,10))
 ttk.Label(quotaLF2,text='Credit:').grid(row=0,column=0,padx=5,pady=5,sticky='w')
@@ -672,7 +677,7 @@ Update database button
 
 ------------------------------------------
 '''
-updateB=ttk.Button(updateFrame,text='Update selected entries')
+updateB=ttk.Button(updateFrame,text='Update selected entries',command= updateDB)
 updateB.grid(row=3,column=1,sticky='news',padx=(0,5),pady=(0,5))
 updateB.state(['disabled'])
 # addB.bind('<Return>',addToDB)
