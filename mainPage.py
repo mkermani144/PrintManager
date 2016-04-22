@@ -410,11 +410,18 @@ def updateDB():
 
 Function to show settings window
 
->>> e:  Event object.
-
 ++++++++++++++++++++++++++++++++++++++++++
 '''
 def showSettings():
+	def changeSettings():
+		if validateIP(defIP) and domain.get():
+			configurations[0]=defIP.get()
+			configurations[2]=domain.get()
+			updateConf(configurations)
+		else:
+			messagebox.showerror(title='Invalid input',
+								message='IP address or domain entry inputs are not valid.')
+			e.focus()
 	t=Toplevel(root)
 	t.grid()
 	f=ttk.Frame(t)
@@ -427,8 +434,8 @@ def showSettings():
 	e.grid(row=0,column=1,pady=(0,10))
 	e.focus()
 	ttk.Entry(f,textvariable=domain).grid(row=1,column=1)
-	ttk.Button(f,text='Apply').grid(row=2,column=0,sticky='e',pady=(10,0),padx=(0,5))
-	ttk.Button(f,text='Cancel').grid(row=2,column=1,sticky='w',pady=(10,0))
+	ttk.Button(f,text='Apply',command=changeSettings).grid(row=2,column=0,sticky='e',pady=(10,0),padx=(0,5))
+	ttk.Button(f,text='Cancel',command= lambda: close(root,t)).grid(row=2,column=1,sticky='w',pady=(10,0))
 
 
 '''
