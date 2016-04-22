@@ -406,6 +406,32 @@ def updateDB():
 
 
 '''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to show settings window
+
+>>> e:  Event object.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
+def showSettings():
+	t=Toplevel(root)
+	t.grid()
+	f=ttk.Frame(t)
+	f.grid(padx=10,pady=10)
+	defIP=StringVar()
+	domain=StringVar()
+	ttk.Label(f,text='Default server IP address:').grid(row=0,column=0,padx=(0,10),pady=(0,10),sticky='n')
+	ttk.Label(f,text='Domain:').grid(row=1,column=0,padx=(0,10),sticky='nw')
+	e=ttk.Entry(f,textvariable=defIP)
+	e.grid(row=0,column=1,pady=(0,10))
+	e.focus()
+	ttk.Entry(f,textvariable=domain).grid(row=1,column=1)
+	ttk.Button(f,text='Apply').grid(row=2,column=0,sticky='e',pady=(10,0),padx=(0,5))
+	ttk.Button(f,text='Cancel').grid(row=2,column=1,sticky='w',pady=(10,0))
+
+
+'''
 ==========================================
 
 Main Window
@@ -557,7 +583,7 @@ menubar=Menu(root)
 root.configure(menu=menubar)
 menu1 = Menu(menubar)
 menubar.add_cascade(menu=menu1, label='menu')
-menu1.add_command(label='settings')
+menu1.add_command(label='settings',command=showSettings)
 menu1.add_command(label='about')
 
 
