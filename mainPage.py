@@ -68,7 +68,7 @@ def connect(ip,e):
 			i=0
 			for entry in connection.entries:
 				dn=entry.entry_get_dn()
-				tree.insert(dn[dn.find(',')+1:],i,text=entry['givenName']+' '+entry['sn'],iid=dn,tags='white')
+				tree.insert(dn[dn.find(',')+1:],i,text=dn[dn.find('=')+1:dn.find(',')],iid=dn,tags='white')
 				i+=1
 
 			connection.search(search_base='dc=salon,dc=iut',
@@ -94,7 +94,8 @@ def connect(ip,e):
 			for widget in treeLF.winfo_children():
 				widget.state(['!disabled'])
 			addB.state(['!disabled'])
-		except:
+		except er:
+			print(er)
 			messagebox.showerror(title='Connection error',message='Cannot connect to server')
 
 	else:
