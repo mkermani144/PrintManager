@@ -53,38 +53,39 @@ to make the result tree
 def connect(ip,e):
 	if validateIP(ip):
 		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
-		username='cn=administrator,cn=users,dc=salon,dc=iut'
-		password='Server2014'
+		username='cn=administrator,cn=users,dc=agriculture,dc=iut'
+		password='Secret'
 		connection=Connection(server,username,password,read_only=True)
 		global usersDictionary
 		usersDictionary={}
 		try:
 			connection.bind()
-			tree.insert('',0,text='salon.iut',iid='DC=salon,DC=iut',tags='white')
-			connection.search(search_base='dc=salon,dc=iut',
+			tree.insert('',0,text='agriculture.iut',iid='OU=AGRICULTURE,DC=agriculture,DC=iut',tags='white')
+			connection.search(search_base='ou=agriculture, dc=agriculture, dc=iut',
 				search_filter='(objectClass=organizationalUnit)',
-				search_scope=SUBTREE)
-			connection.entries.sort()
+				search_scope=SUBTREE
+			)
+			connection.entries.sort(key = lambda s: len(str(s)))
 			i=0
 			for entry in connection.entries:
 				dn=entry.entry_get_dn()
 				tree.insert(dn[dn.find(',')+1:],i,text=dn[dn.find('=')+1:dn.find(',')],iid=dn,tags='white')
 				i+=1
 
-			connection.search(search_base='dc=salon,dc=iut',
+			connection.search(search_base='ou=agriculture, dc=agriculture, dc=iut',
 				search_filter='(objectClass=user)',
 				search_scope=SUBTREE,
 				attributes=['givenName','sn','cn','department','description'])
 			connection.entries.sort()
 			i=0
-			for entry in connection.entries:
+			for entry in connection.entries[::-1]:
 				dn=entry.entry_get_dn()
 				try:
 					tree.insert(dn[dn.find(',')+1:],i,text=entry['cn'],iid=dn,tags='white')
-					usersDictionary[entry['cn']]=entry.entry_get_attributes_dict()
+					usersDictionary[str(entry['cn'])]=entry.entry_get_attributes_dict()
 					i+=1
-				except:
-					pass
+				except RuntimeError as er:
+					print(er)
 			connection.unbind()
 			connectLabel.configure(text='Successfully connected to server.',foreground='green')
 			quotaLF.state(['!disabled'])
@@ -94,7 +95,7 @@ def connect(ip,e):
 			for widget in treeLF.winfo_children():
 				widget.state(['!disabled'])
 			addB.state(['!disabled'])
-		except er:
+		except RuntimeError as er:
 			print(er)
 			messagebox.showerror(title='Connection error',message='Cannot connect to server')
 
@@ -264,7 +265,8 @@ def addToDB():
 		i=0
 		j=0
 		for item in selection:
-			checkQuery="SELECT * FROM credits WHERE student_number='%s';" % item['cn']
+			print(usersDictionary[item['text']])
+			checkQuery="SELECT * FROM credits WHERE student_number='%s';" % item['text']
 			conn=pypyodbc.win_connect_mdb('database.mdb')
 			cur=conn.cursor()
 			cur.execute(checkQuery)
@@ -274,9 +276,9 @@ def addToDB():
 					INSERT INTO credits
 					VALUES
 					('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s');
-				''' % usersDictionary[item]['givenName'],usersDictionary[item]['sn'],usersDictionary[item]['cn'][:2],
-				usersDictionary[item]['cn'],usersDictionary[item]['description'].split()[2],
-				usersDictionary[item]['department'],usersDictionary[item]['description'].split()[1],
+				''' % usersDictionary[item['text']]['givenName'],usersDictionary[item['text']]['sn'],usersDictionary[item['text']]['cn'][:2],
+				usersDictionary[item['text']]['cn'],usersDictionary[item['text']]['description'].split()[2],
+				usersDictionary[item['text']]['department'],usersDictionary[item['text']]['description'].split()[1],
 				credit.get(),maxCredit.get(),minCredit.get(),
 				sheetCredit.get(),sheetMax.get(),discount.get()
 				cur.execute(query)
