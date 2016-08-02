@@ -427,6 +427,7 @@ def showSettings():
 			e.focus()
 	t=Toplevel(root)
 	t.grid()
+	t.grab_set()
 	f=ttk.Frame(t)
 	f.grid(padx=10,pady=10)
 	defIP=StringVar()
@@ -442,6 +443,41 @@ def showSettings():
 
 
 '''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to authenticate user
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
+def showAuthenticate():
+	def authenticate():
+		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
+		connection=Connection(server,'cn='+username.get()+',cn=users,dc=agriculture,dc=iut',password.get(),read_only=True)
+		connection.bind()
+		if not connection.result['result']:
+			close(root, t)
+			messagebox.showinfo(message='Successfully authenticated.')
+			root.deiconify()
+		else:
+			messagebox.showerror(message='Incorrect username or password.')
+			close(root, t)
+			showAuthenticate()
+	t=Toplevel(root)
+	t.grid()
+	root.withdraw()
+	f=ttk.Frame(t)
+	f.grid(padx=10,pady=10)
+	ttk.Label(f,text='Username:').grid(row=0,column=0,padx=(0,10),pady=(0,10),sticky='n')
+	ttk.Label(f,text='Password:').grid(row=1,column=0,padx=(0,10),sticky='nw')
+	e=ttk.Entry(f,textvariable=username)
+	e.grid(row=0,column=1,pady=(0,10))
+	e.focus()
+	ttk.Entry(f,textvariable=password).grid(row=1,column=1)
+	ttk.Button(f,text='Apply',command=authenticate).grid(row=2,column=0,sticky='e',pady=(10,0),padx=(0,5))
+	ttk.Button(f,text='Cancel',command= exit).grid(row=2,column=1,sticky='w',pady=(10,0))
+
+
+'''
 ==========================================
 
 Main Window
@@ -451,6 +487,18 @@ Main Window
 root=Tk()
 root.title('Print manager software - Isfahan university of technology IT center')
 root.resizable(False,False)
+
+
+'''
+==========================================
+
+Authentication
+
+==========================================
+'''
+username = StringVar()
+password = StringVar()
+showAuthenticate()
 
 
 '''
