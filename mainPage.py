@@ -452,7 +452,10 @@ Function to authenticate user
 def showAuthenticate():
 	def authenticate():
 		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
-		connection=Connection(server,'cn='+username.get()+',cn=users,dc=agriculture,dc=iut',password.get(),read_only=True)
+		username_dn = 'cn=' + username.get()
+		username_dn += ',cn=users,dc=agriculture,dc=iut' if username.get()=='administrator' else ',ou=admins,ou=agriculture,dc=agriculture,dc=iut'
+		print(username_dn)
+		connection=Connection(server,username_dn,password.get(),read_only=True)
 		connection.bind()
 		if not connection.result['result']:
 			close(root, t)
