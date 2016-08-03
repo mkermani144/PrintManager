@@ -472,7 +472,7 @@ def showAuthenticate():
 	e=ttk.Entry(f,textvariable=username)
 	e.grid(row=0,column=1,pady=(0,10))
 	e.focus()
-	ttk.Entry(f,textvariable=password).grid(row=1,column=1)
+	ttk.Entry(f,textvariable=password, show="•").grid(row=1,column=1)
 	ttk.Button(f,text='Apply',command=authenticate).grid(row=2,column=0,sticky='e',pady=(10,0),padx=(0,5))
 	ttk.Button(f,text='Cancel',command= exit).grid(row=2,column=1,sticky='w',pady=(10,0))
 
