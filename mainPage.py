@@ -53,9 +53,7 @@ to make the result tree
 def connect(ip,e):
 	if validateIP(ip):
 		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
-		username='cn=administrator,cn=users,dc=agriculture,dc=iut'
-		password='Secret'
-		connection=Connection(server,username,password,read_only=True)
+		connection=Connection(server,username.get(),password.get(),read_only=True)
 		global usersDictionary
 		usersDictionary={}
 		try:
@@ -64,7 +62,7 @@ def connect(ip,e):
 			connection.search(search_base='ou=agriculture, dc=agriculture, dc=iut',
 				search_filter='(objectClass=organizationalUnit)',
 				search_scope=SUBTREE
-			)
+				)
 			connection.entries.sort(key = lambda s: len(str(s)))
 			i=0
 			for entry in connection.entries:
@@ -98,6 +96,8 @@ def connect(ip,e):
 		except RuntimeError as er:
 			print(er)
 			messagebox.showerror(title='Connection error',message='Cannot connect to server')
+		finally:
+			connection.unbind()
 
 	else:
 		flag=messagebox.askretrycancel(title='IP address invalidation',message='IP address is not valid.',icon='error')
@@ -265,7 +265,6 @@ def addToDB():
 		i=0
 		j=0
 		for item in selection:
-			print(usersDictionary[item['text']])
 			checkQuery="SELECT * FROM credits WHERE student_number='%s';" % item['text']
 			conn=pypyodbc.win_connect_mdb('database.mdb')
 			cur=conn.cursor()
@@ -358,8 +357,8 @@ def fetchFromDB(grade,department,entranceYear):
 		else:
 			messagebox.showinfo(title='No result',
 								message='The database returned no result.')
-	except:
-		pass
+	except RuntimeError as er:
+		print(er)
 
 
 
@@ -454,17 +453,19 @@ def showAuthenticate():
 		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
 		username_dn = 'cn=' + username.get()
 		username_dn += ',cn=users,dc=agriculture,dc=iut' if username.get()=='administrator' else ',ou=admins,ou=agriculture,dc=agriculture,dc=iut'
-		print(username_dn)
-		connection=Connection(server,username_dn,password.get(),read_only=True)
+		username.set(username_dn)
+		connection=Connection(server,username.get(),password.get(),read_only=True)
 		connection.bind()
 		if not connection.result['result']:
 			close(root, t)
 			messagebox.showinfo(message='Successfully authenticated.')
 			root.deiconify()
+			connection.unbind()
 		else:
 			messagebox.showerror(message='Incorrect username or password.')
 			close(root, t)
 			showAuthenticate()
+			connection.unbind()
 	t=Toplevel(root)
 	t.grid()
 	root.withdraw()
