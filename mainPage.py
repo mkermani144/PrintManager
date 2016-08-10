@@ -135,6 +135,7 @@ def setDefaultIP(configurations):
 				e.delete(0,'end')
 				e.focus()
 	t=Toplevel(root)
+	t.resizable(False, False)
 	t.grab_set() # Make parent disabled
 	t.title('Default server ip address')
 	ttk.Label(t,text='Please enter IP address for deafault server:').grid(row=0,column=0,columnspan=2,padx=10,pady=10)
@@ -428,6 +429,7 @@ def showSettings():
 								message='IP address or domain entry inputs are not valid.')
 			e.focus()
 	t=Toplevel(root)
+	t.resizable(False, False)
 	t.grid()
 	t.grab_set()
 	f=ttk.Frame(t)
@@ -858,3 +860,7 @@ with open('conf') as f:
 
 center(root)
 root.mainloop()
+
+# TODO: Make all windows unresizable
+# TODO: Authenticate before connect
+# TODO: Beautify window contents
