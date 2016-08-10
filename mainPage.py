@@ -53,7 +53,9 @@ to make the result tree
 def connect(ip,e):
 	if validateIP(ip):
 		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
-		connection=Connection(server,username.get(),password.get(),read_only=True)
+		username_dn = 'cn=' + username.get()
+		username_dn += ',cn=users,dc=agriculture,dc=iut' if username.get()=='administrator' else ',ou=admins,ou=agriculture,dc=agriculture,dc=iut'
+		connection=Connection(server,username_dn,password.get(),read_only=True)
 		global usersDictionary
 		usersDictionary={}
 		try:
@@ -455,8 +457,7 @@ def showAuthenticate():
 		server=Server(ip.get(),use_ssl=True,connect_timeout=.5)
 		username_dn = 'cn=' + username.get()
 		username_dn += ',cn=users,dc=agriculture,dc=iut' if username.get()=='administrator' else ',ou=admins,ou=agriculture,dc=agriculture,dc=iut'
-		username.set(username_dn)
-		connection=Connection(server,username.get(),password.get(),read_only=True)
+		connection=Connection(server,username_dn,password.get(),read_only=True)
 		connection.bind()
 		if not connection.result['result']:
 			close(root, t)
