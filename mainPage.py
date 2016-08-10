@@ -146,6 +146,7 @@ def setDefaultIP(configurations):
 	b2=ttk.Button(t,text='Cancel',command= lambda: close(root,t))
 	b2.grid(row=2,column=1,padx=10,pady=10,sticky='w')
 	# b2.bind('<Return>',lambda ev: close(root,t))
+	center(t)
 
 
 '''
@@ -439,6 +440,7 @@ def showSettings():
 	ttk.Entry(f,textvariable=domain).grid(row=1,column=1)
 	ttk.Button(f,text='Apply',command=changeSettings).grid(row=2,column=0,sticky='e',pady=(10,0),padx=(0,5))
 	ttk.Button(f,text='Cancel',command= lambda: close(root,t)).grid(row=2,column=1,sticky='w',pady=(10,0))
+	center(t)
 
 
 '''
@@ -467,7 +469,8 @@ def showAuthenticate():
 			showAuthenticate()
 			connection.unbind()
 	t=Toplevel(root)
-	t.grid()
+	t.resizable(False,False)
+	# t.geometry('300x100')
 	root.withdraw()
 	f=ttk.Frame(t)
 	f.grid(padx=10,pady=10)
@@ -479,6 +482,24 @@ def showAuthenticate():
 	ttk.Entry(f,textvariable=password, show="•").grid(row=1,column=1)
 	ttk.Button(f,text='Apply',command=authenticate).grid(row=2,column=0,sticky='e',pady=(10,0),padx=(0,5))
 	ttk.Button(f,text='Cancel',command= exit).grid(row=2,column=1,sticky='w',pady=(10,0))
+	center(t)
+
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to center a window
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
+def center(toplevel):
+	toplevel.update_idletasks()
+	w = toplevel.winfo_screenwidth()
+	h = toplevel.winfo_screenheight()
+	size = tuple(int(_) for _ in toplevel.geometry().split('+')[0].split('x'))
+	x = w/2 - size[0]/2
+	y = h/2 - size[1]/2
+	toplevel.geometry("%dx%d+%d+%d" % (size + (x, y)))
 
 
 '''
@@ -834,4 +855,5 @@ with open('conf') as f:
 		if flag:
 			setDefaultIP(configurations)
 
+center(root)
 root.mainloop()
