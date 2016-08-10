@@ -59,18 +59,21 @@ to make the result tree
 def connect(ip, e):
     if validateIP(ip):
         server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
+        subdomain, domain = configurations[2].split('.')
         username_dn = 'cn=' + username.get()
-        username_dn += ',cn=users,dc=agriculture,dc=iut' if username.get(
-        ) == 'administrator' else ',ou=admins,ou=agriculture,dc=agriculture,dc=iut'
+        username_dn += ',cn=users,dc={},dc={}'.format(subdomain, domain) if username.get(
+        ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, domain)
+        username_dn = username_dn.rstrip()
         connection = Connection(server, username_dn,
                                 password.get(), read_only=True)
         global usersDictionary
         usersDictionary = {}
         try:
             connection.bind()
-            tree.insert('', 0, text='agriculture.iut',
-                        iid='OU=AGRICULTURE,DC=agriculture,DC=iut', tags='white')
-            connection.search(search_base='ou=agriculture, dc=agriculture, dc=iut',
+            tree.insert('', 0, text='{}'.format(configurations[2]),
+                        iid='OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, domain).rstrip(), tags='white')
+            print('OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, domain).rstrip())
+            connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, domain).rstrip(),
                               search_filter='(objectClass=organizationalUnit)',
                               search_scope=SUBTREE
                               )
@@ -82,7 +85,7 @@ def connect(ip, e):
                     ',') + 1:], i, text=dn[dn.find('=') + 1:dn.find(',')], iid=dn, tags='white')
                 i += 1
 
-            connection.search(search_base='ou=agriculture, dc=agriculture, dc=iut',
+            connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, domain).rstrip(),
                               search_filter='(objectClass=user)',
                               search_scope=SUBTREE,
                               attributes=['givenName', 'sn', 'cn', 'department', 'description'])
@@ -121,6 +124,7 @@ def connect(ip, e):
         if flag:
             e.delete(0, 'end')
             e.focus()
+    # TODO: Use domain and ip address from configurations
 
 
 '''
@@ -170,7 +174,7 @@ def setDefaultIP(configurations):
     b2.grid(row=2, column=1, padx=10, pady=10, sticky='w')
     # b2.bind('<Return>',lambda ev: close(root,t))
     center(t)
-
+    # TODO: Add default domain name, too
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
@@ -315,7 +319,7 @@ def addToDB():
             if not len(cur.description):
                 i += 1
                 query = '''
-					INSERT INTO credits
+					INSERT INTO Users
 					VALUES
 					('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s');
 				''' % usersDictionary[item['text']]['givenName'], usersDictionary[item['text']]['sn'], usersDictionary[item['text']]['cn'][:2],
@@ -498,6 +502,7 @@ def showSettings():
     ttk.Button(f, text='Cancel', command=lambda: close(root, t)).grid(
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
+    # TODO: Update ip entry of root after changing default ip
 
 
 '''
@@ -511,10 +516,12 @@ Function to authenticate user
 
 def showAuthenticate():
     def authenticate():
+        subdomain, domain = configurations[2].split('.')
         server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
         username_dn = 'cn=' + username.get()
-        username_dn += ',cn=users,dc=agriculture,dc=iut' if username.get(
-        ) == 'administrator' else ',ou=admins,ou=agriculture,dc=agriculture,dc=iut'
+        username_dn += ',cn=users,dc={},dc={}'.format(subdomain, domain) if username.get(
+        ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, domain)
+        username_dn = username_dn.rstrip()
         connection = Connection(server, username_dn,
                                 password.get(), read_only=True)
         connection.bind()
@@ -942,31 +949,6 @@ with open('conf') as f:
     if(configurations[1] == '1'):
         configurations[1] = '0'
         updateConf(configurations)
-        pypyodbc.win_create_mdb('database.mdb')
-        conn = pypyodbc.win_connect_mdb('database.mdb')
-        cur = conn.cursor()
-        query = '''
-			CREATE TABLE credits
-			(
-				first_name VARCHAR(30),
-				last_name VARCHAR(30),
-				entrance_year VARCHAR(2),
-				student_number VARCHAR(7),
-				grade VARCHAR(3),
-				department VARCHAR(15),
-				field VARCHAR(15),
-				credit VARCHAR(7),
-				max_credit VARCHAR(10),
-				min_credit VARCHAR(10),
-				paper_credit VARCHAR(6),
-				paper_max_credit VARCHAR(6),
-				discount VARCHAR(3)
-			)
-		'''
-        cur.execute(query)
-        cur.close()
-        conn.commit()
-        conn.close()
         flag = messagebox.askyesno(message='Default server IP address is set to 127.0.0.1. Do you want to change it?',
                                    icon='question', title='Default IP modification')
         if flag:
