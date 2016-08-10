@@ -72,7 +72,8 @@ def connect(ip, e):
             connection.bind()
             tree.insert('', 0, text='{}'.format(configurations[2]),
                         iid='OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, domain).rstrip(), tags='white')
-            print('OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, domain).rstrip())
+            print('OU={},DC={},DC={}'.format(
+                subdomain.upper(), subdomain, domain).rstrip())
             connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, domain).rstrip(),
                               search_filter='(objectClass=organizationalUnit)',
                               search_scope=SUBTREE
@@ -124,7 +125,6 @@ def connect(ip, e):
         if flag:
             e.delete(0, 'end')
             e.focus()
-    # TODO: Use domain and ip address from configurations
 
 
 '''
@@ -174,6 +174,7 @@ def setDefaultIP(configurations):
     b2.grid(row=2, column=1, padx=10, pady=10, sticky='w')
     # b2.bind('<Return>',lambda ev: close(root,t))
     center(t)
+
     # TODO: Add default domain name, too
 
 '''
@@ -477,6 +478,8 @@ def showSettings():
             configurations[0] = defIP.get()
             configurations[2] = domain.get()
             updateConf(configurations)
+            ip.set(defIP.get())
+            close(root, t)
         else:
             messagebox.showerror(title='Invalid input',
                                  message='IP address or domain entry inputs are not valid.')
@@ -502,7 +505,9 @@ def showSettings():
     ttk.Button(f, text='Cancel', command=lambda: close(root, t)).grid(
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
+
     # TODO: Update ip entry of root after changing default ip
+    # FIXME: Validate domain name
 
 
 '''
@@ -553,7 +558,7 @@ def showAuthenticate():
     ttk.Button(f, text='Cancel', command=exit).grid(
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
-	# FIXME: Fix Close window
+    # FIXME: Fix Close window
     # FIXME: Disable save password
 
 '''
