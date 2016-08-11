@@ -550,6 +550,7 @@ def showSettings():
         else:
             messagebox.showerror(title='Invalid input',
                                  message='IP address or domain entry inputs are not valid.')
+            t.lift()
             e.focus()
     t = Toplevel(root)
     t.resizable(False, False)
@@ -572,8 +573,6 @@ def showSettings():
     ttk.Button(f, text='Cancel', command=lambda: close(root, t)).grid(
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
-
-    # FIXME: Focus on popup after failure
 
 
 '''
