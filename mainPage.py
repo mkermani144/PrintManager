@@ -607,6 +607,7 @@ def showAuthenticate():
             connection.unbind()
     t = Toplevel(root)
     t.resizable(False, False)
+    t.protocol('WM_DELETE_WINDOW', lambda: close(root, t)) 
     # t.geometry('300x100')
     f = ttk.Frame(t)
     f.grid(padx=10, pady=10)
@@ -625,6 +626,7 @@ def showAuthenticate():
     center(t)
     # FIXME: Fix Close window
     # FIXME: Disable save password
+    # FIXME: Fix exit
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
