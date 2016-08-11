@@ -251,20 +251,24 @@ buttons
 >>> rbv:  	Radio button variable
 			indicating state of radio
 			buttons.
->>> entry:  Entry of the IP address.
+>>> entry:  Entry of the IP address or
+			domain name.
+>>> flag:   Number indicating type of
+			ip_or_domain. 0 for ip, 2 for
+			domain.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
 
 
-def toggleEntry(rbv, entry, ip):
+def toggleEntry(rbv, entry, ip_or_domain, flag):
     if rbv.get() == 'new':
         entry.config(state='enabled')
-        ip.set('')
+        ip_or_domain.set('')
     else:
         entry.config(state='disabled')
         with open('conf') as f:
-            ip.set(f.readlines()[0].rstrip())
+            ip_or_domain.set(f.readlines()[flag].rstrip())
 
 
 '''
@@ -624,7 +628,6 @@ def showAuthenticate():
     ttk.Button(f, text='Cancel', command=lambda: close(root, t)).grid(
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
-    # FIXME: Disable save password
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
@@ -705,22 +708,27 @@ ttk.Label(connectLF, text='Connection type:').grid(
 v = StringVar()
 v.set('default')
 ip = StringVar()
+domain = StringVar()
 ttk.Radiobutton(connectLF, text='Connect to new server', variable=v, value='new',
-                command=lambda: toggleEntry(v, e, ip)).grid(row=1, column=0, sticky='w', padx=5)
+                command=lambda: [toggleEntry(v, e, ip, 0), toggleEntry(v, e2, domain, 2)]).grid(row=1, column=0, sticky='w', padx=5)
 ttk.Radiobutton(connectLF, text='Connect to default server', variable=v, value='default',
-                command=lambda: toggleEntry(v, e, ip)).grid(row=2, column=0, sticky='w', padx=5)
+                command=lambda: [toggleEntry(v, e, ip, 0), toggleEntry(v, e2, domain, 2)]).grid(row=2, column=0, sticky='w', padx=5)
 ttk.Label(connectLF, text='IP address:').grid(
     row=3, column=0, padx=5, pady=5, sticky='w')
+ttk.Label(connectLF, text='Domain name:').grid(
+    row=4, column=0, padx=5, pady=5, sticky='w')
 e = ttk.Entry(connectLF, textvariable=ip)
-e.grid(row=3, column=0, columnspan=2, sticky='we', padx=(75, 5), pady=5)
-toggleEntry(v, e, ip)
+e.grid(row=3, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
+e2 = ttk.Entry(connectLF, textvariable=domain)
+e2.grid(row=4, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
+toggleEntry(v, e, ip, 0)
+toggleEntry(v, e2, domain, 2)
 b = ttk.Button(connectLF, text='Connect', command=showAuthenticate)
-b.grid(row=4, column=0, columnspan=3, sticky='news', padx=5, pady=5)
+b.grid(row=5, column=0, columnspan=3, sticky='news', padx=5, pady=5)
 b.bind('<Return>', lambda ev: connect(ip, e))
 connectLabel = ttk.Label(
     connectLF, text='You are not connected to any server.', foreground='red')
-connectLabel.grid(row=5, column=0, columnspan=3, padx=5, pady=5)
-# TODO: Add entry for domain, too
+connectLabel.grid(row=6, column=0, columnspan=3, padx=5, pady=5)
 
 '''
 ------------------------------------------
