@@ -72,7 +72,7 @@ to make the result tree
 
 
 def connect(ip, e):
-    if validateIP(ip):
+    if validateIP(ip) and validateDomain(domain):
         server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
         subdomain, domain = configurations[2].split('.')
         username_dn = 'cn=' + username.get()
