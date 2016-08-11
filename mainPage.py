@@ -284,7 +284,6 @@ def updateConf(configurations):
     with open('conf', 'w') as f:
         for item in configurations:
             f.write(item + '\n')
-    # FIXME: File seems to be too large
 
 
 '''
@@ -572,7 +571,8 @@ def showSettings():
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
 
-    # FIXME: Validate domain name
+    # TODO: Show success message
+	# FIXME: Focus on popup after failure
 
 
 '''
@@ -720,7 +720,7 @@ b.bind('<Return>', lambda ev: connect(ip, e))
 connectLabel = ttk.Label(
     connectLF, text='You are not connected to any server.', foreground='red')
 connectLabel.grid(row=5, column=0, columnspan=3, padx=5, pady=5)
-
+# TODO: Add entry for domain, too
 
 '''
 ------------------------------------------
