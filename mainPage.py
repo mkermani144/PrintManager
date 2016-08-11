@@ -540,7 +540,7 @@ Function to show settings window
 
 def showSettings():
     def changeSettings():
-        if validateIP(defIP) and domain.get():
+        if validateIP(defIP) and validateDomain(domain):
             configurations[0] = defIP.get()
             configurations[2] = domain.get()
             updateConf(configurations)
