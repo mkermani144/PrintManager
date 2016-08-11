@@ -1019,10 +1019,15 @@ with open('conf') as f:
     if(configurations[1] == '1'):
         configurations[1] = '0'
         updateConf(configurations)
-        flag = messagebox.askyesno(message='Default server IP address is set to 127.0.0.1. Do you want to change it?',
-                                   icon='question', title='Default IP modification')
+        flag = messagebox.askyesno(
+			message='Default server IP address is set to 127.0.0.1. Do you want to change it?', icon='question', title='Default IP modification')
         if flag:
             setDefaultIP(configurations)
+
+        flag = messagebox.askyesno(
+        	message='Default server domain address is set to sub.domain. Do you want to change it?', icon='question', title='Default domain modification')
+        if flag:
+            setDefaultDomain(configurations)
 
 center(root)
 root.mainloop()
