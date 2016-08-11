@@ -42,6 +42,7 @@ Function to see if the IP is valid
 def validateIP(ip):
     return re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$', ip.get())
 
+
 '''
 ++++++++++++++++++++++++++++++++++++++++++
 
@@ -190,7 +191,56 @@ def setDefaultIP(configurations):
     # b2.bind('<Return>',lambda ev: close(root,t))
     center(t)
 
-    # TODO: Add default domain name, too
+
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to get the default domain of the
+server from user and set it to the file
+
+>>> configurations:  A list containing
+					 configurations of
+					 the program.
+>>> w:  			 Popup widget asking
+					 the user if he wants
+					 to change default
+					 domain.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
+
+
+def setDefaultDomain(configurations):
+    def setDefaultDomainInner():
+        if validateDomain(domain):
+            configurations[0] = domain.get()
+            updateConf(configurations)
+            messagebox.showinfo(title='Successful operation',
+                                message='Default server domain address changed sucessfully.')
+        else:
+            flag = messagebox.askretrycancel(
+                title='Domain address invalidation', message='Domain address is not valid.', icon='error')
+            if flag:
+                e.delete(0, 'end')
+                e.focus()
+    t = Toplevel(root)
+    t.resizable(False, False)
+    t.grab_set()  # Make parent disabled
+    t.title('Default server domain address')
+    ttk.Label(t, text='Please enter domain address for deafault server:').grid(
+        row=0, column=0, columnspan=2, padx=10, pady=10)
+    domain = StringVar()
+    e = ttk.Entry(t, width=45, textvariable=domain)
+    e.grid(row=1, column=0, columnspan=2, padx=30, pady=10)
+    e.focus()
+    b = ttk.Button(t, text='OK', command=setDefaultDomainInner)
+    b.grid(row=2, column=0, padx=10, pady=10, sticky='e')
+    # b.bind('<Return>',setDefaultDomainInner(e))
+    b2 = ttk.Button(t, text='Cancel', command=lambda: close(root, t))
+    b2.grid(row=2, column=1, padx=10, pady=10, sticky='w')
+    # b2.bind('<Return>',lambda ev: close(root,t))
+    center(t)
+
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
