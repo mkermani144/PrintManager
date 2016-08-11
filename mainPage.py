@@ -607,7 +607,7 @@ def showAuthenticate():
             connection.unbind()
     t = Toplevel(root)
     t.resizable(False, False)
-    t.protocol('WM_DELETE_WINDOW', lambda: close(root, t)) 
+    t.protocol('WM_DELETE_WINDOW', lambda: close(root, t))
     # t.geometry('300x100')
     f = ttk.Frame(t)
     f.grid(padx=10, pady=10)
@@ -621,12 +621,10 @@ def showAuthenticate():
     ttk.Entry(f, textvariable=password, show="•").grid(row=1, column=1)
     ttk.Button(f, text='Apply', command=authenticate).grid(
         row=2, column=0, sticky='e', pady=(10, 0), padx=(0, 5))
-    ttk.Button(f, text='Cancel', command=exit).grid(
+    ttk.Button(f, text='Cancel', command=lambda: close(root, t)).grid(
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
-    # FIXME: Fix Close window
     # FIXME: Disable save password
-    # FIXME: Fix exit
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
