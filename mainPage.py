@@ -544,6 +544,8 @@ def showSettings():
             configurations[2] = domain.get()
             updateConf(configurations)
             ip.set(defIP.get())
+            messagebox.showinfo(title='Successful operation',
+                                message='Default server ip address and domain name changed successfully.')
             close(root, t)
         else:
             messagebox.showerror(title='Invalid input',
@@ -571,8 +573,7 @@ def showSettings():
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
 
-    # TODO: Show success message
-	# FIXME: Focus on popup after failure
+    # FIXME: Focus on popup after failure
 
 
 '''
@@ -1020,12 +1021,12 @@ with open('conf') as f:
         configurations[1] = '0'
         updateConf(configurations)
         flag = messagebox.askyesno(
-			message='Default server IP address is set to 127.0.0.1. Do you want to change it?', icon='question', title='Default IP modification')
+            message='Default server IP address is set to 127.0.0.1. Do you want to change it?', icon='question', title='Default IP modification')
         if flag:
             setDefaultIP(configurations)
 
         flag = messagebox.askyesno(
-        	message='Default server domain address is set to sub.domain. Do you want to change it?', icon='question', title='Default domain modification')
+            message='Default server domain address is set to sub.domain. Do you want to change it?', icon='question', title='Default domain modification')
         if flag:
             setDefaultDomain(configurations)
 
