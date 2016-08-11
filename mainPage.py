@@ -42,6 +42,20 @@ Function to see if the IP is valid
 def validateIP(ip):
     return re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$', ip.get())
 
+'''
+++++++++++++++++++++++++++++++++++++++++++
+
+Function to see if the Domain is valid
+
+>>> domain:  The domain to be validated.
+
+++++++++++++++++++++++++++++++++++++++++++
+'''
+
+
+def validateDomain(domain):
+    return re.match('^[A-Za-z0-9]+\.[A-Za-z0-9]+$', domain.get())
+
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
@@ -125,6 +139,7 @@ def connect(ip, e):
         if flag:
             e.delete(0, 'end')
             e.focus()
+    # FIXME: Mechanic not working
 
 
 '''
@@ -219,6 +234,7 @@ def updateConf(configurations):
     with open('conf', 'w') as f:
         for item in configurations:
             f.write(item + '\n')
+    # FIXME: File seems to be too large
 
 
 '''
@@ -506,7 +522,6 @@ def showSettings():
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
 
-    # TODO: Update ip entry of root after changing default ip
     # FIXME: Validate domain name
 
 
