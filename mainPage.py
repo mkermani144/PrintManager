@@ -74,10 +74,10 @@ to make the result tree
 def connect(ip, e):
     if validateIP(ip) and validateDomain(domain):
         server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
-        subdomain, domain = configurations[2].split('.')
+        subdomain, ldomain = configurations[2].split('.')
         username_dn = 'cn=' + username.get()
-        username_dn += ',cn=users,dc={},dc={}'.format(subdomain, domain) if username.get(
-        ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, domain)
+        username_dn += ',cn=users,dc={},dc={}'.format(subdomain, ldomain) if username.get(
+        ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, ldomain)
         username_dn = username_dn.rstrip()
         connection = Connection(server, username_dn,
                                 password.get(), read_only=True)
@@ -86,10 +86,10 @@ def connect(ip, e):
         try:
             connection.bind()
             tree.insert('', 0, text='{}'.format(configurations[2]),
-                        iid='OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, domain).rstrip(), tags='white')
+                        iid='OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, ldomain).rstrip(), tags='white')
             print('OU={},DC={},DC={}'.format(
-                subdomain.upper(), subdomain, domain).rstrip())
-            connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, domain).rstrip(),
+                subdomain.upper(), subdomain, ldomain).rstrip())
+            connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, ldomain).rstrip(),
                               search_filter='(objectClass=organizationalUnit)',
                               search_scope=SUBTREE
                               )
@@ -101,7 +101,7 @@ def connect(ip, e):
                     ',') + 1:], i, text=dn[dn.find('=') + 1:dn.find(',')], iid=dn, tags='white')
                 i += 1
 
-            connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, domain).rstrip(),
+            connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, ldomain).rstrip(),
                               search_filter='(objectClass=user)',
                               search_scope=SUBTREE,
                               attributes=['givenName', 'sn', 'cn', 'department', 'description'])
@@ -229,7 +229,6 @@ def setDefaultDomain(configurations):
     t.title('Default server domain address')
     ttk.Label(t, text='Please enter domain address for deafault server:').grid(
         row=0, column=0, columnspan=2, padx=10, pady=10)
-    domain = StringVar()
     e = ttk.Entry(t, width=45, textvariable=domain)
     e.grid(row=1, column=0, columnspan=2, padx=30, pady=10)
     e.focus()
@@ -628,6 +627,7 @@ def showAuthenticate():
     ttk.Button(f, text='Cancel', command=lambda: close(root, t)).grid(
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
+    # FIXME: Validate ip and domain
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
