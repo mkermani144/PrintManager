@@ -380,12 +380,12 @@ def addToDB():
         i = 0
         j = 0
         for item in selection:
-            checkQuery = "SELECT * FROM credits WHERE student_number='%s';" % item[
+            checkQuery = "SELECT * FROM Users WHERE stdnum=%s;" % item[
                 'text']
             conn = pypyodbc.win_connect_mdb('database.mdb')
             cur = conn.cursor()
             cur.execute(checkQuery)
-            if not len(cur.description):
+            if not len(cur.fetchall()):
                 i += 1
                 query = '''
 					INSERT INTO Users
@@ -628,6 +628,7 @@ def showAuthenticate():
         row=2, column=1, sticky='w', pady=(10, 0))
     center(t)
     # FIXME: Validate ip and domain
+    # FIXME: Clear entries after destroy
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
@@ -1040,4 +1041,5 @@ with open('conf') as f:
 center(root)
 root.mainloop()
 
+# TODO: Add key bindings
 # TODO: Beautify window contents
