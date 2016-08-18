@@ -176,7 +176,6 @@ def setDefaultIP(configurations):
     t.title('Default server ip address')
     ttk.Label(t, text='Please enter IP address for deafault server:').grid(
         row=0, column=0, columnspan=2, padx=10, pady=10)
-    ip = StringVar()
     e = ttk.Entry(t, width=45, textvariable=ip)
     e.grid(row=1, column=0, columnspan=2, padx=30, pady=10)
     e.focus()
@@ -1047,9 +1046,9 @@ with open('conf') as f:
         if flag:
             setDefaultIP(configurations)
 
-        flag = messagebox.askyesno(
+        flag2 = messagebox.askyesno(
             message='Default server domain address is set to sub.domain. Do you want to change it?', icon='question', title='Default domain modification')
-        if flag:
+        if flag2:
             setDefaultDomain(configurations)
 
 center(root)
