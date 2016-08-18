@@ -1044,7 +1044,7 @@ with open('conf') as f:
             setDefaultDomain(configurations)
 
 center(root)
-root.bind_all('<Return>', lambda ev: ev.widget.invoke())
+root.bind_all('<Return>', lambda ev: ev.widget.invoke() if hasattr(ev.widget, 'invoke') else False)
 root.mainloop()
 
 # TODO: Add key bindings
