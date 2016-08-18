@@ -568,10 +568,15 @@ def showSettings():
         row=0, column=0, padx=(0, 10), pady=(0, 10), sticky='n')
     ttk.Label(f, text='Domain:').grid(
         row=1, column=0, padx=(0, 10), sticky='nw')
-    e = ttk.Entry(f, textvariable=defIP)
-    e.grid(row=0, column=1, pady=(0, 10))
-    e.focus()
-    ttk.Entry(f, textvariable=domain).grid(row=1, column=1)
+    e1 = ttk.Entry(f, textvariable=defIP)
+    e1.grid(row=0, column=1, pady=(0, 10))
+    e1.focus()
+    e2 = ttk.Entry(f, textvariable=domain)
+    e2.grid(row=1, column=1)
+    e1.bind('<Return>', lambda ev: e2.focus())
+    e2 = ttk.Entry(f, textvariable=domain)
+    e2.grid(row=1, column=1)
+    e2.bind('<Return>', lambda ev: changeSettings())
     ttk.Button(f, text='Apply', command=changeSettings).grid(
         row=2, column=0, sticky='e', pady=(10, 0), padx=(0, 5))
     ttk.Button(f, text='Cancel', command=lambda: close(root, t)).grid(
