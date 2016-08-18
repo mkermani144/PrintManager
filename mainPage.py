@@ -43,8 +43,7 @@ def validateIP(ip):
     try:
         socket.inet_aton(ip.get())
         return True
-    except RuntimeError as e:
-        print(e)
+    except socket.error:
         return False
 
 
