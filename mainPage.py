@@ -140,7 +140,6 @@ def connect(ip, e):
         if flag:
             e.delete(0, 'end')
             e.focus()
-    # FIXME: Mechanic not working
 
 
 '''
@@ -632,9 +631,9 @@ def showAuthenticate():
     e2.grid(row=1, column=1)
     e2.bind('<Return>', lambda ev: authenticate())
     ttk.Button(f, text='Apply', command=authenticate).grid(
-        row=2, column=0, sticky='e', pady=(10, 0), padx=(0, 5))
+        row=2, column=0, columnspan=2, sticky='w', pady=(10, 0), padx=(35, 5))
     ttk.Button(f, text='Cancel', command=lambda: [close(root, t), username.set(''), password.set('')]).grid(
-        row=2, column=1, sticky='w', pady=(10, 0))
+        row=2, column=0, columnspan=2, sticky='e', pady=(10, 0), padx=(5, 35))
     center(t)
     # FIXME: Validate ip and domain
 
@@ -1052,5 +1051,3 @@ with open('conf') as f:
 center(root)
 root.bind_all('<Return>', lambda ev: ev.widget.invoke() if hasattr(ev.widget, 'invoke') else False)
 root.mainloop()
-
-# TODO: Beautify window contents
