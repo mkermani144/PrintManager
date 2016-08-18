@@ -155,6 +155,7 @@ def setDefaultIP(configurations):
         if validateIP(ip):
             configurations[0] = ip.get()
             updateConf(configurations)
+            ip.set(ip.get())
             messagebox.showinfo(title='Successful operation',
                                 message='Default server IP address changed sucessfully.')
             close(root, t)
