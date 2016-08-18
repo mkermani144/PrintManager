@@ -206,6 +206,7 @@ def setDefaultDomain(configurations):
         if validateDomain(domain):
             configurations[0] = domain.get()
             updateConf(configurations)
+            domain.set(domain.get())
             messagebox.showinfo(title='Successful operation',
                                 message='Default server domain address changed sucessfully.')
             close(root, t)
