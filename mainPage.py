@@ -722,8 +722,10 @@ domain = StringVar()
 rb = ttk.Radiobutton(connectLF, text='Connect to new server', variable=v, value='new',
                 command=lambda: [toggleEntry(v, e1, ip, 0), toggleEntry(v, e2, domain, 2)])
 rb.grid(row=1, column=0, sticky='w', padx=5)
-ttk.Radiobutton(connectLF, text='Connect to default server', variable=v, value='default',
-                command=lambda: [toggleEntry(v, e1, ip, 0), toggleEntry(v, e2, domain, 2)]).grid(row=2, column=0, sticky='w', padx=5)
+rb2 = ttk.Radiobutton(connectLF, text='Connect to default server', variable=v, value='default',
+                command=lambda: [toggleEntry(v, e1, ip, 0), toggleEntry(v, e2, domain, 2)])
+rb2.grid(row=2, column=0, sticky='w', padx=5)
+rb2.bind('<ButtonRelease>', lambda ev: bc.focus())
 ttk.Label(connectLF, text='IP address:').grid(
     row=3, column=0, padx=5, pady=5, sticky='w')
 ttk.Label(connectLF, text='Domain name:').grid(
@@ -734,9 +736,9 @@ e2 = ttk.Entry(connectLF, textvariable=domain)
 e2.grid(row=4, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
 toggleEntry(v, e1, ip, 0)
 toggleEntry(v, e2, domain, 2)
-b = ttk.Button(connectLF, text='Connect', command=showAuthenticate)
-b.grid(row=5, column=0, columnspan=3, sticky='news', padx=5, pady=5)
-b.focus()
+bc = ttk.Button(connectLF, text='Connect', command=showAuthenticate)
+bc.grid(row=5, column=0, columnspan=3, sticky='news', padx=5, pady=5)
+bc.focus()
 connectLabel = ttk.Label(
     connectLF, text='You are not connected to any server.', foreground='red')
 connectLabel.grid(row=6, column=0, columnspan=3, padx=5, pady=5)
@@ -1052,5 +1054,4 @@ center(root)
 root.bind_all('<Return>', lambda ev: ev.widget.invoke() if hasattr(ev.widget, 'invoke') else False)
 root.mainloop()
 
-# TODO: Add key bindings
 # TODO: Beautify window contents
