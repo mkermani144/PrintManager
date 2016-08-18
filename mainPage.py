@@ -726,7 +726,7 @@ toggleEntry(v, e, ip, 0)
 toggleEntry(v, e2, domain, 2)
 b = ttk.Button(connectLF, text='Connect', command=showAuthenticate)
 b.grid(row=5, column=0, columnspan=3, sticky='news', padx=5, pady=5)
-b.bind('<Return>', lambda ev: connect(ip, e))
+b.bind('<Return>', lambda e: showAuthenticate())
 b.focus()
 connectLabel = ttk.Label(
     connectLF, text='You are not connected to any server.', foreground='red')
