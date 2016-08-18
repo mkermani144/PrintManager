@@ -72,75 +72,66 @@ to make the result tree
 
 
 def connect(ip, e):
-    if validateIP(ip) and validateDomain(domain):
-        server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
-        subdomain, ldomain = configurations[2].split('.')
-        username_dn = 'cn=' + username.get()
-        username_dn += ',cn=users,dc={},dc={}'.format(subdomain, ldomain) if username.get(
-        ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, ldomain)
-        username_dn = username_dn.rstrip()
-        connection = Connection(server, username_dn,
-                                password.get(), read_only=True)
-        global usersDictionary
-        usersDictionary = {}
-        try:
-            connection.bind()
-            tree.insert('', 0, text='{}'.format(configurations[2]),
-                        iid='OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, ldomain).rstrip(), tags='white')
-            print('OU={},DC={},DC={}'.format(
-                subdomain.upper(), subdomain, ldomain).rstrip())
-            connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, ldomain).rstrip(),
-                              search_filter='(objectClass=organizationalUnit)',
-                              search_scope=SUBTREE
-                              )
-            connection.entries.sort(key=lambda s: len(str(s)))
-            i = 0
-            for entry in connection.entries:
-                dn = entry.entry_get_dn()
-                tree.insert(dn[dn.find(
-                    ',') + 1:], i, text=dn[dn.find('=') + 1:dn.find(',')], iid=dn, tags='white')
+    server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
+    subdomain, ldomain = configurations[2].split('.')
+    username_dn = 'cn=' + username.get()
+    username_dn += ',cn=users,dc={},dc={}'.format(subdomain, ldomain) if username.get(
+    ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, ldomain)
+    username_dn = username_dn.rstrip()
+    connection = Connection(server, username_dn,
+                            password.get(), read_only=True)
+    global usersDictionary
+    usersDictionary = {}
+    try:
+        connection.bind()
+        tree.insert('', 0, text='{}'.format(configurations[2]),
+                    iid='OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, ldomain).rstrip(), tags='white')
+        print('OU={},DC={},DC={}'.format(
+            subdomain.upper(), subdomain, ldomain).rstrip())
+        connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, ldomain).rstrip(),
+                          search_filter='(objectClass=organizationalUnit)',
+                          search_scope=SUBTREE
+                          )
+        connection.entries.sort(key=lambda s: len(str(s)))
+        i = 0
+        for entry in connection.entries:
+            dn = entry.entry_get_dn()
+            tree.insert(dn[dn.find(
+                ',') + 1:], i, text=dn[dn.find('=') + 1:dn.find(',')], iid=dn, tags='white')
+            i += 1
+
+        connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, ldomain).rstrip(),
+                          search_filter='(objectClass=user)',
+                          search_scope=SUBTREE,
+                          attributes=['givenName', 'sn', 'cn', 'department', 'description'])
+        connection.entries.sort()
+        i = 0
+        for entry in connection.entries[::-1]:
+            dn = entry.entry_get_dn()
+            try:
+                tree.insert(dn[dn.find(',') + 1:], i,
+                            text=entry['cn'], iid=dn, tags='white')
+                usersDictionary[
+                    str(entry['cn'])] = entry.entry_get_attributes_dict()
                 i += 1
-
-            connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, ldomain).rstrip(),
-                              search_filter='(objectClass=user)',
-                              search_scope=SUBTREE,
-                              attributes=['givenName', 'sn', 'cn', 'department', 'description'])
-            connection.entries.sort()
-            i = 0
-            for entry in connection.entries[::-1]:
-                dn = entry.entry_get_dn()
-                try:
-                    tree.insert(dn[dn.find(',') + 1:], i,
-                                text=entry['cn'], iid=dn, tags='white')
-                    usersDictionary[
-                        str(entry['cn'])] = entry.entry_get_attributes_dict()
-                    i += 1
-                except RuntimeError as er:
-                    print(er)
-            connection.unbind()
-            connectLabel.configure(
-                text='Successfully connected to server.', foreground='green')
-            quotaLF.state(['!disabled'])
-            for widget in quotaLF.winfo_children():
-                widget.state(['!disabled'])
-            treeLF.state(['!disabled'])
-            for widget in treeLF.winfo_children():
-                widget.state(['!disabled'])
-            addB.state(['!disabled'])
-        except RuntimeError as er:
-            print(er)
-            messagebox.showerror(title='Connection error',
-                                 message='Cannot connect to server')
-        finally:
-            connection.unbind()
-
-    else:
-        flag = messagebox.askretrycancel(
-            title='IP address invalidation', message='IP address is not valid.', icon='error')
-        if flag:
-            e.delete(0, 'end')
-            e.focus()
-
+            except RuntimeError as er:
+                print(er)
+        connection.unbind()
+        connectLabel.configure(
+            text='Successfully connected to server.', foreground='green')
+        quotaLF.state(['!disabled'])
+        for widget in quotaLF.winfo_children():
+            widget.state(['!disabled'])
+        treeLF.state(['!disabled'])
+        for widget in treeLF.winfo_children():
+            widget.state(['!disabled'])
+        addB.state(['!disabled'])
+    except RuntimeError as er:
+        print(er)
+        messagebox.showerror(title='Connection error',
+                             message='Cannot connect to server')
+    finally:
+        connection.unbind()
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
@@ -593,49 +584,52 @@ Function to authenticate user
 
 
 def showAuthenticate():
-    def authenticate():
-        subdomain, domain = configurations[2].split('.')
-        server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
-        username_dn = 'cn=' + username.get()
-        username_dn += ',cn=users,dc={},dc={}'.format(subdomain, domain) if username.get(
-        ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, domain)
-        username_dn = username_dn.rstrip()
-        connection = Connection(server, username_dn,
-                                password.get(), read_only=True)
-        connection.bind()
-        if not connection.result['result']:
-            close(root, t)
-            messagebox.showinfo(message='Successfully authenticated.')
-            connection.unbind()
-            connect(ip, e)
-        else:
-            messagebox.showerror(message='Incorrect username or password.')
-            close(root, t)
-            showAuthenticate()
-            connection.unbind()
-    t = Toplevel(root)
-    t.resizable(False, False)
-    t.protocol('WM_DELETE_WINDOW', lambda: [close(root, t), username.set(''), password.set('')])
-    # t.geometry('300x100')
-    f = ttk.Frame(t)
-    f.grid(padx=10, pady=10)
-    ttk.Label(f, text='Username:').grid(row=0, column=0,
-                                        padx=(0, 10), pady=(0, 10), sticky='n')
-    ttk.Label(f, text='Password:').grid(
-        row=1, column=0, padx=(0, 10), sticky='nw')
-    e = ttk.Entry(f, textvariable=username)
-    e.grid(row=0, column=1, pady=(0, 10))
-    e.focus()
-    e.bind('<Return>', lambda ev: e2.focus())
-    e2 = ttk.Entry(f, textvariable=password, show="•")
-    e2.grid(row=1, column=1)
-    e2.bind('<Return>', lambda ev: authenticate())
-    ttk.Button(f, text='Apply', command=authenticate).grid(
-        row=2, column=0, columnspan=2, sticky='w', pady=(10, 0), padx=(35, 5))
-    ttk.Button(f, text='Cancel', command=lambda: [close(root, t), username.set(''), password.set('')]).grid(
-        row=2, column=0, columnspan=2, sticky='e', pady=(10, 0), padx=(5, 35))
-    center(t)
-    # FIXME: Validate ip and domain
+    if validateIP(ip) and validateDomain(domain):
+        def authenticate():
+            subdomain, domain = configurations[2].split('.')
+            server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
+            username_dn = 'cn=' + username.get()
+            username_dn += ',cn=users,dc={},dc={}'.format(subdomain, domain) if username.get(
+            ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, domain)
+            username_dn = username_dn.rstrip()
+            connection = Connection(server, username_dn,
+                                    password.get(), read_only=True)
+            connection.bind()
+            if not connection.result['result']:
+                close(root, t)
+                messagebox.showinfo(message='Successfully authenticated.')
+                connection.unbind()
+                connect(ip, e)
+            else:
+                messagebox.showerror(message='Incorrect username or password.')
+                close(root, t)
+                showAuthenticate()
+                connection.unbind()
+        t = Toplevel(root)
+        t.resizable(False, False)
+        t.protocol('WM_DELETE_WINDOW', lambda: [close(root, t), username.set(''), password.set('')])
+        # t.geometry('300x100')
+        f = ttk.Frame(t)
+        f.grid(padx=10, pady=10)
+        ttk.Label(f, text='Username:').grid(row=0, column=0,
+                                            padx=(0, 10), pady=(0, 10), sticky='n')
+        ttk.Label(f, text='Password:').grid(
+            row=1, column=0, padx=(0, 10), sticky='nw')
+        e = ttk.Entry(f, textvariable=username)
+        e.grid(row=0, column=1, pady=(0, 10))
+        e.focus()
+        e.bind('<Return>', lambda ev: e2.focus())
+        e2 = ttk.Entry(f, textvariable=password, show="•")
+        e2.grid(row=1, column=1)
+        e2.bind('<Return>', lambda ev: authenticate())
+        ttk.Button(f, text='Apply', command=authenticate).grid(
+            row=2, column=0, columnspan=2, sticky='w', pady=(10, 0), padx=(35, 5))
+        ttk.Button(f, text='Cancel', command=lambda: [close(root, t), username.set(''), password.set('')]).grid(
+            row=2, column=0, columnspan=2, sticky='e', pady=(10, 0), padx=(5, 35))
+        center(t)
+    else:
+        flag = messagebox.showerror(
+            title='Input invalidation', message='IP address or domain name is not valid.', icon='error')
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
