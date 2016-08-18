@@ -5,7 +5,7 @@ from re import match
 from ldap3 import *
 import pypyodbc
 import time
-
+import socket
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
@@ -40,7 +40,12 @@ Function to see if the IP is valid
 
 
 def validateIP(ip):
-    return re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$', ip.get())
+    try:
+        socket.inet_aton(ip.get())
+        return True
+    except RuntimeError as e:
+        print(e)
+        return False
 
 
 '''
