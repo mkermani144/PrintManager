@@ -264,6 +264,7 @@ def toggleEntry(rbv, entry, ip_or_domain, flag):
     if rbv.get() == 'new':
         entry.config(state='enabled')
         ip_or_domain.set('')
+        e1.focus()
     else:
         entry.config(state='disabled')
         with open('conf') as f:
@@ -710,19 +711,20 @@ v = StringVar()
 v.set('default')
 ip = StringVar()
 domain = StringVar()
-ttk.Radiobutton(connectLF, text='Connect to new server', variable=v, value='new',
-                command=lambda: [toggleEntry(v, e, ip, 0), toggleEntry(v, e2, domain, 2)]).grid(row=1, column=0, sticky='w', padx=5)
+rb = ttk.Radiobutton(connectLF, text='Connect to new server', variable=v, value='new',
+                command=lambda: [toggleEntry(v, e1, ip, 0), toggleEntry(v, e2, domain, 2)])
+rb.grid(row=1, column=0, sticky='w', padx=5)
 ttk.Radiobutton(connectLF, text='Connect to default server', variable=v, value='default',
-                command=lambda: [toggleEntry(v, e, ip, 0), toggleEntry(v, e2, domain, 2)]).grid(row=2, column=0, sticky='w', padx=5)
+                command=lambda: [toggleEntry(v, e1, ip, 0), toggleEntry(v, e2, domain, 2)]).grid(row=2, column=0, sticky='w', padx=5)
 ttk.Label(connectLF, text='IP address:').grid(
     row=3, column=0, padx=5, pady=5, sticky='w')
 ttk.Label(connectLF, text='Domain name:').grid(
     row=4, column=0, padx=5, pady=5, sticky='w')
-e = ttk.Entry(connectLF, textvariable=ip)
-e.grid(row=3, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
+e1 = ttk.Entry(connectLF, textvariable=ip)
+e1.grid(row=3, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
 e2 = ttk.Entry(connectLF, textvariable=domain)
 e2.grid(row=4, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
-toggleEntry(v, e, ip, 0)
+toggleEntry(v, e1, ip, 0)
 toggleEntry(v, e2, domain, 2)
 b = ttk.Button(connectLF, text='Connect', command=showAuthenticate)
 b.grid(row=5, column=0, columnspan=3, sticky='news', padx=5, pady=5)
