@@ -157,6 +157,7 @@ def setDefaultIP(configurations):
             updateConf(configurations)
             messagebox.showinfo(title='Successful operation',
                                 message='Default server IP address changed sucessfully.')
+            close(root, t)
         else:
             flag = messagebox.askretrycancel(
                 title='IP address invalidation', message='IP address is not valid.', icon='error')
@@ -207,6 +208,7 @@ def setDefaultDomain(configurations):
             updateConf(configurations)
             messagebox.showinfo(title='Successful operation',
                                 message='Default server domain address changed sucessfully.')
+            close(root, t)
         else:
             flag = messagebox.askretrycancel(
                 title='Domain address invalidation', message='Domain address is not valid.', icon='error')
