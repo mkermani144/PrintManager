@@ -540,6 +540,7 @@ def showSettings():
             configurations[2] = domain.get()
             updateConf(configurations)
             ip.set(defIP.get())
+            domain.set(domain.get())
             messagebox.showinfo(title='Successful operation',
                                 message='Default server ip address and domain name changed successfully.')
             close(root, t)
