@@ -860,7 +860,13 @@ root.configure(menu=menubar)
 menu1 = Menu(menubar)
 menubar.add_cascade(menu=menu1, label='menu')
 menu1.add_command(label='settings', command=showSettings)
-menu1.add_command(label='about')
+menu1.add_command(
+	label='about',
+	command= lambda: messagebox.showinfo(
+		title='About',
+		message='Made with ♥ by Mohammad Kermani at Linux lab.\n \
+				Copyright 2016, IUT.'
+))
 
 
 '''
