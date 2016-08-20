@@ -6,6 +6,7 @@ from ldap3 import *
 import pypyodbc
 import time
 import socket
+from datetime import datetime
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
@@ -14,8 +15,8 @@ Function to destroy widgets passed to it
 excluding the first one
 
 >>> *args:  All of the widgets to be
-			destroyed and the widget to be
-			kept.
+            destroyed and the widget to be
+            kept.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -90,8 +91,6 @@ def connect(ip, e):
         connection.bind()
         tree.insert('', 0, text='{}'.format(configurations[2]),
                     iid='OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, ldomain).rstrip(), tags='white')
-        print('OU={},DC={},DC={}'.format(
-            subdomain.upper(), subdomain, ldomain).rstrip())
         connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, ldomain).rstrip(),
                           search_filter='(objectClass=organizationalUnit)',
                           search_scope=SUBTREE
@@ -117,9 +116,10 @@ def connect(ip, e):
                             text=entry['cn'], iid=dn, tags='white')
                 usersDictionary[
                     str(entry['cn'])] = entry.entry_get_attributes_dict()
+                usersDictionary[str(entry['cn'])].update({'dn': dn})
                 i += 1
             except RuntimeError as er:
-                print(er)
+                pass
         connection.unbind()
         connectLabel.configure(
             text='Successfully connected to server.', foreground='green')
@@ -131,7 +131,6 @@ def connect(ip, e):
             widget.state(['!disabled'])
         addB.state(['!disabled'])
     except RuntimeError as er:
-        print(er)
         messagebox.showerror(title='Connection error',
                              message='Cannot connect to server')
     finally:
@@ -144,11 +143,11 @@ Function to get the default IP of the
 server from user and set it to the file
 
 >>> configurations:  A list containing
-					 configurations of
-					 the program.
->>> w:  			 Popup widget asking
-					 the user if he wants
-					 to change default ip.
+                     configurations of
+                     the program.
+>>> w:               Popup widget asking
+                     the user if he wants
+                     to change default ip.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -201,12 +200,12 @@ Function to get the default domain of the
 server from user and set it to the file
 
 >>> configurations:  A list containing
-					 configurations of
-					 the program.
->>> w:  			 Popup widget asking
-					 the user if he wants
-					 to change default
-					 domain.
+                     configurations of
+                     the program.
+>>> w:               Popup widget asking
+                     the user if he wants
+                     to change default
+                     domain.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -251,14 +250,14 @@ def setDefaultDomain(configurations):
 Function to toggle between two radio
 buttons
 
->>> rbv:  	Radio button variable
-			indicating state of radio
-			buttons.
+>>> rbv:      Radio button variable
+            indicating state of radio
+            buttons.
 >>> entry:  Entry of the IP address or
-			domain name.
+            domain name.
 >>> flag:   Number indicating type of
-			ip_or_domain. 0 for ip, 2 for
-			domain.
+            ip_or_domain. 0 for ip, 2 for
+            domain.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -281,8 +280,8 @@ def toggleEntry(rbv, entry, ip_or_domain, flag):
 Function to update the conf file
 
 >>> configuration:  List contaning
-					configurations of the
-					program.
+                    configurations of the
+                    program.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -301,13 +300,13 @@ Function to toggle color of result tree
 entries when they are selected/deselected
 
 >>> type:  String indicating if function
-		   call type should be simple or
-		   complex.
+           call type should be simple or
+           complex.
 >>> flag:  Flag indicating if the entry
-		   should be disabled/enabled.
+           should be disabled/enabled.
 >>> l:     List containing all of result
-		   tree entries whose colors
-		   should be toggled.
+           tree entries whose colors
+           should be toggled.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -385,25 +384,107 @@ def addToDB():
         i = 0
         j = 0
         for item in selection:
-            checkQuery = "SELECT * FROM Users WHERE stdnum=%s;" % item[
-                'text']
+            checkQuery = "SELECT * FROM Users WHERE stdnum=%s;" % usersDictionary[item['text']]['cn'][0]
             conn = pypyodbc.win_connect_mdb('database.mdb')
             cur = conn.cursor()
             cur.execute(checkQuery)
             if not len(cur.fetchall()):
                 i += 1
+                dict = {
+                    'firstname': usersDictionary[item['text']]['givenName'][0],
+                    'lastname': usersDictionary[item['text']]['sn'][0],
+                    'stdnum': int(usersDictionary[item['text']]['cn'][0]),
+                    'department': domain.get().split('.')[0],
+                    'grade': usersDictionary[item['text']]['dn'].split(',')[2][3:],
+                    'discount': int(discount.get()),
+                    'paper_credit': int(sheetCredit.get()),
+                    'credit': int(credit.get()),
+                    'min_credit': int(minCredit.get()),
+                    'enabled' : 'Yes',
+                    'entrance_year' : int(usersDictionary[item['text']]['cn'][0][:2]),
+                    'username' : usersDictionary[item['text']]['cn'][0],
+                    'add_date' : datetime.now(),
+                    'max_credit' : int(maxCredit.get()),
+                    'max_paper_credit' : int(sheetMax.get())
+                }
+                # query = '''
+                #     INSERT INTO Users
+                #     (
+                #         Name,
+                #         Family,
+                #         stdnum,
+                #         Department,
+                #         Grade,
+                #         Discount,
+                #         paperCredit,
+                #         Credit,
+                #         minCredit,
+                #         Enabled,
+                #         EntranceYear,
+                #         userName,
+                #         addDate,
+                #         maxCredit,
+                #         maxPaperCredit
+                #     )
+                #     VALUES
+                #     (
+                #         {firstname},
+                #         {lastname},
+                #         {stdnum},
+                #         {department},
+                #         {grade},
+                #         {discount},
+                #         {paper_credit},
+                #         {credit},
+                #         {min_credit},
+                #         {enabled},
+                #         {entrance_year},
+                #         {username},
+                #         {add_date},
+                #         {max_credit},
+                #         {max_paper_credit}
+                #     );
+                # '''
+                # query = query.format(**dict)
                 query = '''
-					INSERT INTO Users
-					VALUES
-					('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s');
-				''' % usersDictionary[item['text']]['givenName'], usersDictionary[item['text']]['sn'], usersDictionary[item['text']]['cn'][:2],
-                usersDictionary[item['text']]['cn'], usersDictionary[
-                    item['text']]['description'].split()[2],
-                usersDictionary[item['text']]['department'], usersDictionary[
-                    item['text']]['description'].split()[1],
-                credit.get(), maxCredit.get(), minCredit.get(),
-                sheetCredit.get(), sheetMax.get(), discount.get()
-                cur.execute(query)
+                    INSERT INTO Users
+                    (
+                        Name,
+                        Family,
+                        stdnum,
+                        Department,
+                        Grade,
+                        Discount,
+                        paperCredit,
+                        Credit,
+                        minCredit,
+                        Enabled,
+                        EntranceYear,
+                        userName,
+                        addDate,
+                        maxCredit,
+                        maxPaperCredit
+                    )
+                    VALUES
+                    (
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?
+                    );
+                '''
+                cur.execute(query, list(dict.values()))
             else:
                 j += 1
         cur.commit()
@@ -429,12 +510,12 @@ def addToDB():
 Function to fetch data from database based
 on entry values
 
->>> grade:  	   Grade of students to be
-				   fetched.
+>>> grade:         Grade of students to be
+                   fetched.
 >>> department:    department of students to
-				   be fetched.
+                   be fetched.
 >>> entranceYear:  Entrance year of
-				   students to be fetched.
+                   students to be fetched.
 
 ++++++++++++++++++++++++++++++++++++++++++
 '''
@@ -485,7 +566,7 @@ def fetchFromDB(grade, department, entranceYear):
             messagebox.showinfo(title='No result',
                                 message='The database returned no result.')
     except RuntimeError as er:
-        print(er)
+        pass
 
 
 '''
@@ -511,17 +592,17 @@ def updateDB():
         if selectionIIDs:
             for item in selectionIIDs:
                 query = '''
-					UPDATE credits
-					SET
-					credit='%s',
-					max_credit='%s',
-					min_credit='%s',
-					paper_credit='%s',
-					paper_max_credit='%s',
-					discount='%s'
-					WHERE
-					student_number='%s';
-				''' % (credit2.get(), maxCredit2.get(), minCredit2.get(), sheetCredit2.get(),
+                    UPDATE credits
+                    SET
+                    credit='%s',
+                    max_credit='%s',
+                    min_credit='%s',
+                    paper_credit='%s',
+                    paper_max_credit='%s',
+                    discount='%s'
+                    WHERE
+                    student_number='%s';
+                ''' % (credit2.get(), maxCredit2.get(), minCredit2.get(), sheetCredit2.get(),
                     sheetMax2.get(), discount2.get(), usersStdnums[item])
                 conn = pypyodbc.win_connect_mdb('database.mdb')
                 cur = conn.cursor()
@@ -861,11 +942,11 @@ menu1 = Menu(menubar)
 menubar.add_cascade(menu=menu1, label='menu')
 menu1.add_command(label='settings', command=showSettings)
 menu1.add_command(
-	label='about',
-	command= lambda: messagebox.showinfo(
-		title='About',
-		message='Made with ♥ by Mohammad Kermani at Linux lab.\n \
-				Copyright 2016, IUT.'
+    label='about',
+    command= lambda: messagebox.showinfo(
+        title='About',
+        message='Made with ♥ by Mohammad Kermani at Linux lab.\n \
+                Copyright 2016, IUT.'
 ))
 
 
