@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
@@ -7,6 +8,7 @@ import pypyodbc
 import time
 import socket
 from datetime import datetime
+import sys
 
 '''
 ++++++++++++++++++++++++++++++++++++++++++
@@ -687,9 +689,9 @@ def showAuthenticate():
         e2.grid(row=1, column=1)
         e2.bind('<Return>', lambda ev: authenticate())
         ttk.Button(f, text='Apply', command=authenticate).grid(
-            row=2, column=0, columnspan=2, sticky='w', pady=(10, 0), padx=(35, 5))
+            row=2, column=0, columnspan=2, sticky='w', pady=(10, 0), padx=(20, 5))
         ttk.Button(f, text='Cancel', command=lambda: [close(root, t), username.set(''), password.set('')]).grid(
-            row=2, column=0, columnspan=2, sticky='e', pady=(10, 0), padx=(5, 35))
+            row=2, column=0, columnspan=2, sticky='e', pady=(10, 0), padx=(5, 20))
         center(t)
     else:
         flag = messagebox.showerror(
@@ -714,404 +716,410 @@ def center(toplevel):
     toplevel.geometry("%dx%d+%d+%d" % (size + (x, y)))
 
 
-'''
-==========================================
+try:
+    with open('conf') as f:
+        '''
+        ==========================================
 
-Main Window
+        Main Window
 
-==========================================
-'''
-root = Tk()
-root.title('Print manager software - Isfahan university of technology IT center')
-root.resizable(False, False)
-
-
-'''
-==========================================
-
-Authentication variables
-
-==========================================
-'''
-username = StringVar()
-password = StringVar()
+        ==========================================
+        '''
+        root = Tk()
+        root.title('Print manager software - Isfahan university of technology IT center')
+        root.resizable(False, False)
 
 
-'''
-==========================================
+        '''
+        ==========================================
 
-Notebook
+        Authentication variables
 
-==========================================
-'''
-nb = ttk.Notebook(root)
-nb.grid(row=0, column=0)
-
-
-'''
-==========================================
-
-Tab to be used for adding new entries
-
-==========================================
-'''
-addNewFrame = ttk.Frame(nb)
-addNewFrame.grid(row=0, column=1)
+        ==========================================
+        '''
+        username = StringVar()
+        password = StringVar()
 
 
-'''
-------------------------------------------
+        '''
+        ==========================================
 
-Connect section
+        Notebook
 
-------------------------------------------
-'''
-connectLF = ttk.Labelframe(addNewFrame, text='Connect', width=200, height=50)
-connectLF.grid(row=0, column=1, padx=(0, 5), pady=5, sticky='news')
-connectLF.columnconfigure(0, weight=1)
-ttk.Label(connectLF, text='Connection type:').grid(
-    row=0, column=0, padx=5, pady=(0, 5), sticky='w')
-v = StringVar()
-v.set('default')
-ip = StringVar()
-domain = StringVar()
-rb = ttk.Radiobutton(connectLF, text='Connect to new server', variable=v, value='new',
-                command=lambda: [toggleEntry(v, e1, ip, 0), toggleEntry(v, e2, domain, 2)])
-rb.grid(row=1, column=0, sticky='w', padx=5)
-rb2 = ttk.Radiobutton(connectLF, text='Connect to default server', variable=v, value='default',
-                command=lambda: [toggleEntry(v, e1, ip, 0), toggleEntry(v, e2, domain, 2)])
-rb2.grid(row=2, column=0, sticky='w', padx=5)
-rb2.bind('<ButtonRelease>', lambda ev: bc.focus())
-ttk.Label(connectLF, text='IP address:').grid(
-    row=3, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(connectLF, text='Domain name:').grid(
-    row=4, column=0, padx=5, pady=5, sticky='w')
-e1 = ttk.Entry(connectLF, textvariable=ip)
-e1.grid(row=3, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
-e2 = ttk.Entry(connectLF, textvariable=domain)
-e2.grid(row=4, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
-toggleEntry(v, e1, ip, 0)
-toggleEntry(v, e2, domain, 2)
-bc = ttk.Button(connectLF, text='Connect', command=showAuthenticate)
-bc.grid(row=5, column=0, columnspan=3, sticky='news', padx=5, pady=5)
-bc.focus()
-connectLabel = ttk.Label(
-    connectLF, text='You are not connected to any server.', foreground='red')
-connectLabel.grid(row=6, column=0, columnspan=3, padx=5, pady=5)
-
-'''
-------------------------------------------
-
-Quota section
-
-------------------------------------------
-'''
-quotaLF = ttk.Labelframe(addNewFrame, text='Credits', width=200, height=350)
-quotaLF.grid(row=2, column=1, padx=(0, 5), pady=5, sticky='news')
-quotaLF.columnconfigure(2, weight=1)
-credit = StringVar()
-maxCredit = StringVar()
-minCredit = StringVar()
-sheetCredit = StringVar()
-sheetMax = StringVar()
-discount = StringVar()
-ttk.Label(quotaLF, text='rials').grid(
-    row=0, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='rials').grid(
-    row=1, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='rials').grid(
-    row=2, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='sheets').grid(
-    row=3, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='sheets').grid(
-    row=4, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='percent').grid(
-    row=5, column=2, padx=5, pady=(5, 10), sticky='w')
-ttk.Entry(quotaLF, textvariable=credit).grid(row=0, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF, textvariable=maxCredit).grid(
-    row=1, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF, textvariable=minCredit).grid(
-    row=2, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF, textvariable=sheetCredit).grid(
-    row=3, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF, textvariable=sheetMax).grid(row=4, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF, textvariable=discount).grid(
-    row=5, column=1, padx=5, pady=(5, 10))
-ttk.Label(quotaLF, text='Credit:').grid(
-    row=0, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='Max permitted credit:').grid(
-    row=1, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='Min permitted credit:').grid(
-    row=2, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='Sheet credit:').grid(
-    row=3, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='Max permitted sheet credit:').grid(
-    row=4, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF, text='Discount:').grid(
-    row=5, column=0, padx=5, pady=(5, 10), sticky='w')
-quotaLF.state(['disabled'])
-for widget in quotaLF.winfo_children():
-    widget.state(['disabled'])
+        ==========================================
+        '''
+        nb = ttk.Notebook(root)
+        nb.grid(row=0, column=0)
 
 
-'''
-------------------------------------------
+        '''
+        ==========================================
 
-Result tree section
+        Tab to be used for adding new entries
 
-------------------------------------------
-'''
-treeLF = ttk.Labelframe(addNewFrame, text='Search results')
-treeLF.grid(row=0, column=0, rowspan=3, padx=5, pady=5, sticky='news')
-treeLF.rowconfigure(0, weight=1)
-tree = ttk.Treeview(treeLF, show='tree')
-tree.grid(row=0, column=0, columnspan=2, pady=(5, 0), sticky='nws')
-s = ttk.Scrollbar(treeLF, orient=VERTICAL, command=tree.yview)
-s.grid(row=0, column=2, pady=(5, 0), sticky='ns')
-tree.configure(yscrollcommand=s.set)
-tree.tag_configure('green', background='#88CC22')
-tree.tag_configure('white', background='white')
-tree.tag_configure('yellow', background='#CCEE66')
-b = ttk.Button(treeLF, text='Select', command=lambda: toggleColor(
-    'complex', 1, tree.selection()))
-b.grid(row=1, column=0, sticky='news', padx=5, pady=5)
-b2 = ttk.Button(treeLF, text='Deselect', command=lambda: toggleColor(
-    'complex', 0, tree.selection()))
-b2.grid(row=1, column=1, sticky='news', padx=5, pady=5)
-treeLF.state(['disabled'])
-for widget in treeLF.winfo_children():
-    widget.state(['disabled'])
+        ==========================================
+        '''
+        addNewFrame = ttk.Frame(nb)
+        addNewFrame.grid(row=0, column=1)
 
 
-'''
-------------------------------------------
+        '''
+        ------------------------------------------
 
-Add to database button
+        Connect section
 
-------------------------------------------
-'''
-addB = ttk.Button(addNewFrame, text='Add selected entries', command=addToDB)
-addB.grid(row=3, column=1, sticky='news', padx=(0, 5), pady=(0, 5))
-addB.bind('<Return>', addToDB)
-addB.state(['disabled'])
+        ------------------------------------------
+        '''
+        connectLF = ttk.Labelframe(addNewFrame, text='Connect', width=200, height=50)
+        connectLF.grid(row=0, column=1, padx=(0, 5), pady=5, sticky='news')
+        connectLF.columnconfigure(0, weight=1)
+        ttk.Label(connectLF, text='Connection type:').grid(
+            row=0, column=0, padx=5, pady=(0, 5), sticky='w')
+        v = StringVar()
+        v.set('default')
+        ip = StringVar()
+        domain = StringVar()
+        rb = ttk.Radiobutton(connectLF, text='Connect to new server', variable=v, value='new',
+                        command=lambda: [toggleEntry(v, e1, ip, 0), toggleEntry(v, e2, domain, 2)])
+        rb.grid(row=1, column=0, sticky='w', padx=5)
+        rb2 = ttk.Radiobutton(connectLF, text='Connect to default server', variable=v, value='default',
+                        command=lambda: [toggleEntry(v, e1, ip, 0), toggleEntry(v, e2, domain, 2)])
+        rb2.grid(row=2, column=0, sticky='w', padx=5)
+        rb2.bind('<ButtonRelease>', lambda ev: bc.focus())
+        ttk.Label(connectLF, text='IP address:').grid(
+            row=3, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(connectLF, text='Domain name:').grid(
+            row=4, column=0, padx=5, pady=5, sticky='w')
+        e1 = ttk.Entry(connectLF, textvariable=ip)
+        e1.grid(row=3, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
+        e2 = ttk.Entry(connectLF, textvariable=domain)
+        e2.grid(row=4, column=0, columnspan=2, sticky='we', padx=(100, 5), pady=5)
+        toggleEntry(v, e1, ip, 0)
+        toggleEntry(v, e2, domain, 2)
+        bc = ttk.Button(connectLF, text='Connect', command=showAuthenticate)
+        bc.grid(row=5, column=0, columnspan=3, sticky='news', padx=5, pady=5)
+        bc.focus()
+        connectLabel = ttk.Label(
+            connectLF, text='You are not connected to any server.', foreground='red')
+        connectLabel.grid(row=6, column=0, columnspan=3, padx=5, pady=5)
 
+        '''
+        ------------------------------------------
 
-'''
-==========================================
+        Quota section
 
-Menubar
-
-==========================================
-'''
-root.option_add('*tearOff', FALSE)
-menubar = Menu(root)
-root.configure(menu=menubar)
-menu1 = Menu(menubar)
-menubar.add_cascade(menu=menu1, label='menu')
-menu1.add_command(label='settings', command=showSettings)
-menu1.add_command(
-    label='about',
-    command= lambda: messagebox.showinfo(
-        title='About',
-        message='Made with ♥ by Mohammad Kermani at Linux lab.\n \
-                Copyright 2016, IUT.'
-))
-
-
-'''
-==========================================
-
-Tab to be used for updating existing
-entries
-
-==========================================
-'''
-updateFrame = ttk.Frame(nb)
-updateFrame.grid(row=0, column=0)
-updateFrame.columnconfigure(1, weight=1)
-
-
-'''
-------------------------------------------
-
-Result tree section 2
-
-------------------------------------------
-'''
-treeLF2 = ttk.Labelframe(updateFrame, text='Search result')
-treeLF2.grid(row=0, column=0, rowspan=3, padx=5, pady=5, sticky='news')
-treeLF2.rowconfigure(0, weight=1)
-tree2 = ttk.Treeview(treeLF2, show='tree')
-tree2.grid(row=0, column=0, columnspan=2, pady=(5, 0), sticky='nws')
-tree2.tag_configure('green', background='#88CC22')
-tree2.tag_configure('white', background='white')
-s2 = ttk.Scrollbar(treeLF2, orient=VERTICAL, command=tree2.yview)
-s2.grid(row=0, column=2, pady=(5, 0), sticky='ns')
-tree2.configure(yscrollcommand=s2.set)
-# tree.tag_configure('green',background='#88CC22')
-# tree.tag_configure('white',background='white')
-# tree.tag_configure('yellow',background='#CCEE66')
-b21 = ttk.Button(treeLF2, text='Select', command=lambda: toggleColor(
-    'simple', 1, tree2.selection()))
-b21.grid(row=2, column=0, sticky='news', padx=5, pady=5)
-b22 = ttk.Button(treeLF2, text='Deselect',
-                 command=lambda: toggleColor('simple', 0, tree2.selection()))
-b22.grid(row=2, column=1, sticky='news', padx=5, pady=5)
-treeLF2.state(['disabled'])
-for widget in treeLF2.winfo_children():
-    widget.state(['disabled'])
-
-
-'''
-------------------------------------------
-
-Select entries section
-
-------------------------------------------
-'''
-selectEntriesLF = ttk.Labelframe(
-    updateFrame, text='Select Entries', width=200, height=50)
-selectEntriesLF.grid(row=0, column=1, padx=(0, 5), pady=5, sticky='news')
-selectEntriesLF.columnconfigure(1, weight=1)
-# b2.bind('<Return>',lambda ev: connect(ip,e))
-ttk.Label(selectEntriesLF, text='Grade:').grid(
-    row=0, column=0, padx=(50, 5), pady=5, sticky='w')
-ttk.Label(selectEntriesLF, text='Department:').grid(
-    row=1, column=0, padx=(50, 5), pady=5, sticky='w')
-ttk.Label(selectEntriesLF, text='Entrance year:').grid(
-    row=2, column=0, padx=(50, 5), pady=5, sticky='w')
-grade = StringVar()
-department = StringVar()
-entranceYear = StringVar()
-grades = ['all', 'bs', 'ms', 'phd']
-departments = ['all', 'Physics', 'Mathematics', 'Chemistry', 'Agricultural Engineering',
-               'Natural Resources', 'Electrical & Computer Eng', 'Industrial Engineering',
-               'Materials Engineering', 'Mining Engineering', 'Civil Engineering',
-               'Mechanical Engineering', 'Chemical Engineering', 'Textile Engineering']
-entranceYears = ['all']
-grade.set(grades[0])
-department.set(departments[0])
-entranceYear.set(entranceYears[0])
-ttk.Combobox(selectEntriesLF, textvariable=grade, values=grades, state='readonly').grid(
-    row=0, column=1, padx=(5, 50), pady=5, sticky='we')
-ttk.Combobox(selectEntriesLF, textvariable=department, values=departments,
-             state='readonly').grid(row=1, column=1, padx=(5, 50), pady=5, sticky='we')
-ttk.Combobox(selectEntriesLF, textvariable=entranceYear, values=entranceYears).grid(
-    row=2, column=1, padx=(5, 50), pady=5, sticky='we')
-b2 = ttk.Button(selectEntriesLF, text='Fetch',
-                command=lambda: fetchFromDB(grade, department, entranceYear))
-b2.grid(row=3, column=0, columnspan=2, sticky='ew', padx=5, pady=5)
-selectLabel = ttk.Label(
-    selectEntriesLF, text='You have not fetched any entries.', foreground='red')
-selectLabel.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
+        ------------------------------------------
+        '''
+        quotaLF = ttk.Labelframe(addNewFrame, text='Credits', width=200, height=350)
+        quotaLF.grid(row=2, column=1, padx=(0, 5), pady=5, sticky='news')
+        quotaLF.columnconfigure(2, weight=1)
+        credit = StringVar()
+        maxCredit = StringVar()
+        minCredit = StringVar()
+        sheetCredit = StringVar()
+        sheetMax = StringVar()
+        discount = StringVar()
+        ttk.Label(quotaLF, text='rials').grid(
+            row=0, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='rials').grid(
+            row=1, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='rials').grid(
+            row=2, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='sheets').grid(
+            row=3, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='sheets').grid(
+            row=4, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='percent').grid(
+            row=5, column=2, padx=5, pady=(5, 10), sticky='w')
+        ttk.Entry(quotaLF, textvariable=credit).grid(row=0, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF, textvariable=maxCredit).grid(
+            row=1, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF, textvariable=minCredit).grid(
+            row=2, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF, textvariable=sheetCredit).grid(
+            row=3, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF, textvariable=sheetMax).grid(row=4, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF, textvariable=discount).grid(
+            row=5, column=1, padx=5, pady=(5, 10))
+        ttk.Label(quotaLF, text='Credit:').grid(
+            row=0, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='Max permitted credit:').grid(
+            row=1, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='Min permitted credit:').grid(
+            row=2, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='Sheet credit:').grid(
+            row=3, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='Max permitted sheet credit:').grid(
+            row=4, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF, text='Discount:').grid(
+            row=5, column=0, padx=5, pady=(5, 10), sticky='w')
+        quotaLF.state(['disabled'])
+        for widget in quotaLF.winfo_children():
+            widget.state(['disabled'])
 
 
-'''
-------------------------------------------
+        '''
+        ------------------------------------------
 
-Quota section 2
+        Result tree section
 
-------------------------------------------
-'''
-quotaLF2 = ttk.Labelframe(updateFrame, text='Credits', width=200, height=350)
-quotaLF2.grid(row=2, column=1, padx=(0, 5), pady=5, sticky='news')
-quotaLF2.columnconfigure(2, weight=1)
-credit2 = StringVar()
-maxCredit2 = StringVar()
-minCredit2 = StringVar()
-sheetCredit2 = StringVar()
-sheetMax2 = StringVar()
-discount2 = StringVar()
-ttk.Label(quotaLF2, text='rials').grid(
-    row=0, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='rials').grid(
-    row=1, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='rials').grid(
-    row=2, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='sheets').grid(
-    row=3, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='sheets').grid(
-    row=4, column=2, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='percent').grid(
-    row=5, column=2, padx=5, pady=(5, 10), sticky='w')
-ttk.Entry(quotaLF2, textvariable=credit2).grid(row=0, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF2, textvariable=maxCredit2).grid(
-    row=1, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF2, textvariable=minCredit2).grid(
-    row=2, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF2, textvariable=sheetCredit2).grid(
-    row=3, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF2, textvariable=sheetMax2).grid(
-    row=4, column=1, padx=5, pady=5)
-ttk.Entry(quotaLF2, textvariable=discount2).grid(
-    row=5, column=1, padx=5, pady=(5, 10))
-ttk.Label(quotaLF2, text='Credit:').grid(
-    row=0, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='Max permitted credit:').grid(
-    row=1, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='Min permitted credit:').grid(
-    row=2, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='Sheet credit:').grid(
-    row=3, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='Max permitted sheet credit:').grid(
-    row=4, column=0, padx=5, pady=5, sticky='w')
-ttk.Label(quotaLF2, text='Discount:').grid(
-    row=5, column=0, padx=5, pady=(5, 10), sticky='w')
-quotaLF2.state(['disabled'])
-for widget in quotaLF2.winfo_children():
-    widget.state(['disabled'])
+        ------------------------------------------
+        '''
+        treeLF = ttk.Labelframe(addNewFrame, text='Search results')
+        treeLF.grid(row=0, column=0, rowspan=3, padx=5, pady=5, sticky='news')
+        treeLF.rowconfigure(0, weight=1)
+        tree = ttk.Treeview(treeLF, show='tree')
+        tree.grid(row=0, column=0, columnspan=2, pady=(5, 0), sticky='nws')
+        s = ttk.Scrollbar(treeLF, orient=VERTICAL, command=tree.yview)
+        s.grid(row=0, column=2, pady=(5, 0), sticky='ns')
+        tree.configure(yscrollcommand=s.set)
+        tree.tag_configure('green', background='#88CC22')
+        tree.tag_configure('white', background='white')
+        tree.tag_configure('yellow', background='#CCEE66')
+        b = ttk.Button(treeLF, text='Select', command=lambda: toggleColor(
+            'complex', 1, tree.selection()))
+        b.grid(row=1, column=0, sticky='news', padx=5, pady=5)
+        b2 = ttk.Button(treeLF, text='Deselect', command=lambda: toggleColor(
+            'complex', 0, tree.selection()))
+        b2.grid(row=1, column=1, sticky='news', padx=5, pady=5)
+        treeLF.state(['disabled'])
+        for widget in treeLF.winfo_children():
+            widget.state(['disabled'])
 
 
-'''
-------------------------------------------
+        '''
+        ------------------------------------------
 
-Update database button
+        Add to database button
 
-------------------------------------------
-'''
-updateB = ttk.Button(
-    updateFrame, text='Update selected entries', command=updateDB)
-updateB.grid(row=3, column=1, sticky='news', padx=(0, 5), pady=(0, 5))
-updateB.state(['disabled'])
-# addB.bind('<Return>',addToDB)
-
-
-'''
-------------------------------------------
-
-Adding frames to notebook
-
-------------------------------------------
-'''
-nb.add(addNewFrame, text=' Add new users ')
-nb.add(updateFrame, text=' Update existing users ')
+        ------------------------------------------
+        '''
+        addB = ttk.Button(addNewFrame, text='Add selected entries', command=addToDB)
+        addB.grid(row=3, column=1, sticky='news', padx=(0, 5), pady=(0, 5))
+        addB.bind('<Return>', addToDB)
+        addB.state(['disabled'])
 
 
-'''
-==========================================
+        '''
+        ==========================================
 
-Opening file and checking whether it is
-first time the program is run
+        Menubar
 
-==========================================
-'''
-with open('conf') as f:
-    configurations = f.readlines()
-    configurations[0] = configurations[0].strip()
-    configurations[1] = configurations[1].strip()
-    if(configurations[1] == '1'):
-        configurations[1] = '0'
-        updateConf(configurations)
-        flag = messagebox.askyesno(
-            message='Default server IP address is set to 127.0.0.1. Do you want to change it?', icon='question', title='Default IP modification')
-        if flag:
-            setDefaultIP(configurations)
-        else:
-            flag2 = messagebox.askyesno(
-                message='Default server domain address is set to sub.domain. Do you want to change it?', icon='question', title='Default domain modification')
-            if flag2:
-                setDefaultDomain(configurations)
+        ==========================================
+        '''
+        root.option_add('*tearOff', FALSE)
+        menubar = Menu(root)
+        root.configure(menu=menubar)
+        menu1 = Menu(menubar)
+        menubar.add_cascade(menu=menu1, label='menu')
+        menu1.add_command(label='settings', command=showSettings)
+        menu1.add_command(
+            label='about',
+            command= lambda: messagebox.showinfo(
+                title='About',
+                message='Made with ♥ by Mohammad Kermani at Linux lab.\n \
+                        Copyright 2016, IUT.'
+        ))
 
-center(root)
-root.bind_all('<Return>', lambda ev: ev.widget.invoke() if hasattr(ev.widget, 'invoke') else False)
-root.mainloop()
+
+        '''
+        ==========================================
+
+        Tab to be used for updating existing
+        entries
+
+        ==========================================
+        '''
+        updateFrame = ttk.Frame(nb)
+        updateFrame.grid(row=0, column=0)
+        updateFrame.columnconfigure(1, weight=1)
+
+
+        '''
+        ------------------------------------------
+
+        Result tree section 2
+
+        ------------------------------------------
+        '''
+        treeLF2 = ttk.Labelframe(updateFrame, text='Search result')
+        treeLF2.grid(row=0, column=0, rowspan=3, padx=5, pady=5, sticky='news')
+        treeLF2.rowconfigure(0, weight=1)
+        tree2 = ttk.Treeview(treeLF2, show='tree')
+        tree2.grid(row=0, column=0, columnspan=2, pady=(5, 0), sticky='nws')
+        tree2.tag_configure('green', background='#88CC22')
+        tree2.tag_configure('white', background='white')
+        s2 = ttk.Scrollbar(treeLF2, orient=VERTICAL, command=tree2.yview)
+        s2.grid(row=0, column=2, pady=(5, 0), sticky='ns')
+        tree2.configure(yscrollcommand=s2.set)
+        # tree.tag_configure('green',background='#88CC22')
+        # tree.tag_configure('white',background='white')
+        # tree.tag_configure('yellow',background='#CCEE66')
+        b21 = ttk.Button(treeLF2, text='Select', command=lambda: toggleColor(
+            'simple', 1, tree2.selection()))
+        b21.grid(row=2, column=0, sticky='news', padx=5, pady=5)
+        b22 = ttk.Button(treeLF2, text='Deselect',
+                         command=lambda: toggleColor('simple', 0, tree2.selection()))
+        b22.grid(row=2, column=1, sticky='news', padx=5, pady=5)
+        treeLF2.state(['disabled'])
+        for widget in treeLF2.winfo_children():
+            widget.state(['disabled'])
+
+
+        '''
+        ------------------------------------------
+
+        Select entries section
+
+        ------------------------------------------
+        '''
+        selectEntriesLF = ttk.Labelframe(
+            updateFrame, text='Select Entries', width=200, height=50)
+        selectEntriesLF.grid(row=0, column=1, padx=(0, 5), pady=5, sticky='news')
+        selectEntriesLF.columnconfigure(1, weight=1)
+        # b2.bind('<Return>',lambda ev: connect(ip,e))
+        ttk.Label(selectEntriesLF, text='Grade:').grid(
+            row=0, column=0, padx=(50, 5), pady=5, sticky='w')
+        ttk.Label(selectEntriesLF, text='Department:').grid(
+            row=1, column=0, padx=(50, 5), pady=5, sticky='w')
+        ttk.Label(selectEntriesLF, text='Entrance year:').grid(
+            row=2, column=0, padx=(50, 5), pady=5, sticky='w')
+        grade = StringVar()
+        department = StringVar()
+        entranceYear = StringVar()
+        grades = ['all', 'bs', 'ms', 'phd']
+        departments = ['all', 'Physics', 'Mathematics', 'Chemistry', 'Agricultural Engineering',
+                       'Natural Resources', 'Electrical & Computer Eng', 'Industrial Engineering',
+                       'Materials Engineering', 'Mining Engineering', 'Civil Engineering',
+                       'Mechanical Engineering', 'Chemical Engineering', 'Textile Engineering']
+        entranceYears = ['all']
+        grade.set(grades[0])
+        department.set(departments[0])
+        entranceYear.set(entranceYears[0])
+        ttk.Combobox(selectEntriesLF, textvariable=grade, values=grades, state='readonly').grid(
+            row=0, column=1, padx=(5, 50), pady=5, sticky='we')
+        ttk.Combobox(selectEntriesLF, textvariable=department, values=departments,
+                     state='readonly').grid(row=1, column=1, padx=(5, 50), pady=5, sticky='we')
+        ttk.Combobox(selectEntriesLF, textvariable=entranceYear, values=entranceYears).grid(
+            row=2, column=1, padx=(5, 50), pady=5, sticky='we')
+        b2 = ttk.Button(selectEntriesLF, text='Fetch',
+                        command=lambda: fetchFromDB(grade, department, entranceYear))
+        b2.grid(row=3, column=0, columnspan=2, sticky='ew', padx=5, pady=5)
+        selectLabel = ttk.Label(
+            selectEntriesLF, text='You have not fetched any entries.', foreground='red')
+        selectLabel.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
+
+
+        '''
+        ------------------------------------------
+
+        Quota section 2
+
+        ------------------------------------------
+        '''
+        quotaLF2 = ttk.Labelframe(updateFrame, text='Credits', width=200, height=350)
+        quotaLF2.grid(row=2, column=1, padx=(0, 5), pady=5, sticky='news')
+        quotaLF2.columnconfigure(2, weight=1)
+        credit2 = StringVar()
+        maxCredit2 = StringVar()
+        minCredit2 = StringVar()
+        sheetCredit2 = StringVar()
+        sheetMax2 = StringVar()
+        discount2 = StringVar()
+        ttk.Label(quotaLF2, text='rials').grid(
+            row=0, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='rials').grid(
+            row=1, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='rials').grid(
+            row=2, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='sheets').grid(
+            row=3, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='sheets').grid(
+            row=4, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='percent').grid(
+            row=5, column=2, padx=5, pady=(5, 10), sticky='w')
+        ttk.Entry(quotaLF2, textvariable=credit2).grid(row=0, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=maxCredit2).grid(
+            row=1, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=minCredit2).grid(
+            row=2, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=sheetCredit2).grid(
+            row=3, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=sheetMax2).grid(
+            row=4, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=discount2).grid(
+            row=5, column=1, padx=5, pady=(5, 10))
+        ttk.Label(quotaLF2, text='Credit:').grid(
+            row=0, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Max permitted credit:').grid(
+            row=1, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Min permitted credit:').grid(
+            row=2, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Sheet credit:').grid(
+            row=3, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Max permitted sheet credit:').grid(
+            row=4, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Discount:').grid(
+            row=5, column=0, padx=5, pady=(5, 10), sticky='w')
+        quotaLF2.state(['disabled'])
+        for widget in quotaLF2.winfo_children():
+            widget.state(['disabled'])
+
+
+        '''
+        ------------------------------------------
+
+        Update database button
+
+        ------------------------------------------
+        '''
+        updateB = ttk.Button(
+            updateFrame, text='Update selected entries', command=updateDB)
+        updateB.grid(row=3, column=1, sticky='news', padx=(0, 5), pady=(0, 5))
+        updateB.state(['disabled'])
+        # addB.bind('<Return>',addToDB)
+
+
+        '''
+        ------------------------------------------
+
+        Adding frames to notebook
+
+        ------------------------------------------
+        '''
+        nb.add(addNewFrame, text=' Add new users ')
+        nb.add(updateFrame, text=' Update existing users ')
+
+
+        '''
+        ==========================================
+
+        Opening file and checking whether it is
+        first time the program is run
+
+        ==========================================
+        '''
+        with open('conf') as f:
+            configurations = f.readlines()
+            configurations[0] = configurations[0].strip()
+            configurations[1] = configurations[1].strip()
+            if(configurations[1] == '1'):
+                configurations[1] = '0'
+                updateConf(configurations)
+                flag = messagebox.askyesno(
+                    message='Default server IP address is set to 127.0.0.1. Do you want to change it?', icon='question', title='Default IP modification')
+                if flag:
+                    setDefaultIP(configurations)
+                else:
+                    flag2 = messagebox.askyesno(
+                        message='Default server domain address is set to sub.domain. Do you want to change it?', icon='question', title='Default domain modification')
+                    if flag2:
+                        setDefaultDomain(configurations)
+
+        center(root)
+        root.bind_all('<Return>', lambda ev: ev.widget.invoke() if hasattr(ev.widget, 'invoke') else False)
+        root.mainloop()
+except EnvironmentError:
+    messagebox.showerror(title="Missed configurations file",
+                        message="No configurations file found. Exiting.")
+    sys.exit()
