@@ -383,75 +383,44 @@ def addToDB():
     if selection:
         i = 0
         j = 0
+        conn = pypyodbc.win_connect_mdb('database.mdb')
+        cur = conn.cursor()
+        mp = {
+            'B.Sc': 3,
+            'M.Sc': 4,
+            'Ph.D': 5
+        }
+        depQuery = "SELECT DepartmentID FROM Departments;"
+        cur.execute(depQuery)
+        dep = cur.fetchall()[0][0]
         for item in selection:
-            checkQuery = "SELECT * FROM Users WHERE stdnum=%s;" % usersDictionary[item['text']]['cn'][0]
-            conn = pypyodbc.win_connect_mdb('database.mdb')
-            cur = conn.cursor()
-            cur.execute(checkQuery)
+            checkQuery = "SELECT * FROM Users WHERE userName=?;"
+            l = []
+            l.append(str(usersDictionary[item['text']]['cn'][0]))
+            cur.execute(checkQuery, l)
             if not len(cur.fetchall()):
                 i += 1
-                dict = {
-                    'firstname': usersDictionary[item['text']]['givenName'][0],
-                    'lastname': usersDictionary[item['text']]['sn'][0],
-                    'stdnum': int(usersDictionary[item['text']]['cn'][0]),
-                    'department': domain.get().split('.')[0],
-                    'grade': usersDictionary[item['text']]['dn'].split(',')[2][3:],
-                    'discount': int(discount.get()),
-                    'paper_credit': int(sheetCredit.get()),
-                    'credit': int(credit.get()),
-                    'min_credit': int(minCredit.get()),
-                    'enabled' : 'Yes',
-                    'entrance_year' : int(usersDictionary[item['text']]['cn'][0][:2]),
-                    'username' : usersDictionary[item['text']]['cn'][0],
-                    'add_date' : datetime.now(),
-                    'max_credit' : int(maxCredit.get()),
-                    'max_paper_credit' : int(sheetMax.get())
-                }
-                # query = '''
-                #     INSERT INTO Users
-                #     (
-                #         Name,
-                #         Family,
-                #         stdnum,
-                #         Department,
-                #         Grade,
-                #         Discount,
-                #         paperCredit,
-                #         Credit,
-                #         minCredit,
-                #         Enabled,
-                #         EntranceYear,
-                #         userName,
-                #         addDate,
-                #         maxCredit,
-                #         maxPaperCredit
-                #     )
-                #     VALUES
-                #     (
-                #         {firstname},
-                #         {lastname},
-                #         {stdnum},
-                #         {department},
-                #         {grade},
-                #         {discount},
-                #         {paper_credit},
-                #         {credit},
-                #         {min_credit},
-                #         {enabled},
-                #         {entrance_year},
-                #         {username},
-                #         {add_date},
-                #         {max_credit},
-                #         {max_paper_credit}
-                #     );
-                # '''
-                # query = query.format(**dict)
+                val = [
+                    usersDictionary[item['text']]['givenName'][0], # firstname
+                    usersDictionary[item['text']]['sn'][0], # lastname
+                    dep, # department
+                    mp[usersDictionary[item['text']]['dn'].split(',')[2][3:]], # grade
+                    int(discount.get()), # discount
+                    int(sheetCredit.get()), # paper_credit
+                    int(credit.get()), # credit
+                    int(minCredit.get()), # min_credit
+                    True, # enabled
+                    int('13' + usersDictionary[item['text']]['cn'][0][:2]), # entrance_year
+                    str(usersDictionary[item['text']]['cn'][0]), # username
+                    datetime.now(), # add_date
+                    int(maxCredit.get()), # max_credit
+                    int(sheetMax.get()) # max_paper_credit
+                ]
                 query = '''
                     INSERT INTO Users
                     (
                         Name,
                         Family,
-                        stdnum,
                         Department,
                         Grade,
                         Discount,
@@ -480,11 +449,10 @@ def addToDB():
                         ?,
                         ?,
                         ?,
-                        ?,
                         ?
                     );
                 '''
-                cur.execute(query, list(dict.values()))
+                cur.execute(query, val)
             else:
                 j += 1
         cur.commit()
