@@ -917,7 +917,7 @@ try:
             label='about',
             command= lambda: messagebox.showinfo(
                 title='About',
-                message='Made with ♥ by Mohammad Kermani at Linux lab.\n \
+                message='<> with ♥ by Mohammad Kermani at Linux lab.\n \
                         Copyright 2016, IUT.'
         ))
 
