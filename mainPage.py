@@ -80,7 +80,7 @@ to make the result tree
 
 def connect(ip, e):
     server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
-    subdomain, ldomain = configurations[2].split('.')
+    subdomain, ldomain = domain.get().split('.')
     username_dn = 'cn=' + username.get()
     username_dn += ',cn=users,dc={},dc={}'.format(subdomain, ldomain) if username.get(
     ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, ldomain)
@@ -92,7 +92,7 @@ def connect(ip, e):
     try:
         connection.bind()
         tree.insert('', 0, text='{}'.format(configurations[2]),
-                    iid='OU={},DC={},DC={}'.format(subdomain.upper(), subdomain, ldomain).rstrip(), tags='white')
+                    iid='OU={},DC={},DC={}'.format(subdomain.lower(), subdomain.lower(), ldomain).rstrip(), tags='white')
         connection.search(search_base='ou={}, dc={}, dc={}'.format(subdomain, subdomain, ldomain).rstrip(),
                           search_filter='(objectClass=organizationalUnit)',
                           search_scope=SUBTREE
@@ -216,7 +216,7 @@ server from user and set it to the file
 def setDefaultDomain(configurations):
     def setDefaultDomainInner():
         if validateDomain(domain):
-            configurations[0] = domain.get()
+            configurations[2] = domain.get()
             updateConf(configurations)
             domain.set(domain.get())
             messagebox.showinfo(title='Successful operation',
@@ -385,14 +385,14 @@ def addToDB():
     if selection:
         i = 0
         j = 0
-        conn = pypyodbc.win_connect_mdb('database.mdb')
+        conn = pypyodbc.win_connect_mdb('XLDB.mdb')
         cur = conn.cursor()
         mp = {
-            'B.Sc': 3,
-            'M.Sc': 4,
-            'Ph.D': 5
+            'B.Sc': 'bs',
+            'M.Sc': 'ms',
+            'Ph.D': 'phd'
         }
-        depQuery = "SELECT DepartmentID FROM Departments;"
+        depQuery = "SELECT DepartmentName FROM Departments;"
         cur.execute(depQuery)
         dep = cur.fetchall()[0][0]
         for item in selection:
@@ -406,13 +406,13 @@ def addToDB():
                     usersDictionary[item['text']]['givenName'][0], # firstname
                     usersDictionary[item['text']]['sn'][0], # lastname
                     dep, # department
-                    mp[usersDictionary[item['text']]['dn'].split(',')[2][3:]], # grade
+                    vars().get("mp[usersDictionary[item['text']]['dn'].split(',')[2][3:]]", ''), # grade
                     int(discount.get()), # discount
                     int(sheetCredit.get()), # paper_credit
                     int(credit.get()), # credit
                     int(minCredit.get()), # min_credit
                     True, # enabled
-                    int('13' + usersDictionary[item['text']]['cn'][0][:2]), # entrance_year
+                    vars().get("int('13' + usersDictionary[item['text']]['cn'][0][:2])", 0), # entrance_year
                     str(usersDictionary[item['text']]['cn'][0]), # username
                     datetime.now(), # add_date
                     int(maxCredit.get()), # max_credit
@@ -493,7 +493,7 @@ on entry values
 
 def fetchFromDB(grade, department, entranceYear):
     try:
-        conn = pypyodbc.win_connect_mdb('database.mdb')
+        conn = pypyodbc.win_connect_mdb('XLDB.mdb')
         cur = conn.cursor()
         query = 'SELECT * FROM credits'
         needsAnd = False
@@ -574,7 +574,7 @@ def updateDB():
                     student_number='%s';
                 ''' % (credit2.get(), maxCredit2.get(), minCredit2.get(), sheetCredit2.get(),
                     sheetMax2.get(), discount2.get(), usersStdnums[item])
-                conn = pypyodbc.win_connect_mdb('database.mdb')
+                conn = pypyodbc.win_connect_mdb('XLDB.mdb')
                 cur = conn.cursor()
                 cur.execute(query)
                 cur.commit()
@@ -600,10 +600,10 @@ def showSettings():
     def changeSettings():
         if validateIP(defIP) and validateDomain(domain):
             configurations[0] = defIP.get()
-            configurations[2] = domain.get()
+            configurations[2] = defDomain.get()
             updateConf(configurations)
             ip.set(defIP.get())
-            domain.set(domain.get())
+            domain.set(defDomain.get())
             messagebox.showinfo(title='Successful operation',
                                 message='Default server ip address and domain name changed successfully.')
             close(root, t)
@@ -611,7 +611,7 @@ def showSettings():
             messagebox.showerror(title='Invalid input',
                                  message='IP address or domain entry inputs are not valid.')
             t.lift()
-            e.focus()
+            e1.focus()
     t = Toplevel(root)
     t.resizable(False, False)
     t.grid()
@@ -619,7 +619,7 @@ def showSettings():
     f = ttk.Frame(t)
     f.grid(padx=10, pady=10)
     defIP = StringVar()
-    domain = StringVar()
+    defDomain = StringVar()
     ttk.Label(f, text='Default server IP address:').grid(
         row=0, column=0, padx=(0, 10), pady=(0, 10), sticky='n')
     ttk.Label(f, text='Domain:').grid(
@@ -627,11 +627,9 @@ def showSettings():
     e1 = ttk.Entry(f, textvariable=defIP)
     e1.grid(row=0, column=1, pady=(0, 10))
     e1.focus()
-    e2 = ttk.Entry(f, textvariable=domain)
+    e2 = ttk.Entry(f, textvariable=defDomain)
     e2.grid(row=1, column=1)
     e1.bind('<Return>', lambda ev: e2.focus())
-    e2 = ttk.Entry(f, textvariable=domain)
-    e2.grid(row=1, column=1)
     e2.bind('<Return>', lambda ev: changeSettings())
     ttk.Button(f, text='Apply', command=changeSettings).grid(
         row=2, column=0, sticky='e', pady=(10, 0), padx=(0, 5))
@@ -652,25 +650,30 @@ Function to authenticate user
 def showAuthenticate():
     if validateIP(ip) and validateDomain(domain):
         def authenticate():
-            subdomain, domain = configurations[2].split('.')
+            subdomain, ddomain = domain.get().split('.')
             server = Server(ip.get(), use_ssl=True, connect_timeout=.5)
             username_dn = 'cn=' + username.get()
-            username_dn += ',cn=users,dc={},dc={}'.format(subdomain, domain) if username.get(
-            ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, domain)
+            username_dn += ',cn=users,dc={},dc={}'.format(subdomain, ddomain) if username.get(
+            ) == 'administrator' else ',ou=admins,ou={},dc={},dc={}'.format(subdomain, subdomain, ddomain)
             username_dn = username_dn.rstrip()
             connection = Connection(server, username_dn,
                                     password.get(), read_only=True)
-            connection.bind()
-            if not connection.result['result']:
-                close(root, t)
-                messagebox.showinfo(message='Successfully authenticated.')
-                connection.unbind()
-                connect(ip, e)
-            else:
-                messagebox.showerror(message='Incorrect username or password.')
-                close(root, t)
-                showAuthenticate()
-                connection.unbind()
+            try:
+                connection.bind()
+                if not connection.result['result']:
+                    close(root, t)
+                    messagebox.showinfo(message='Successfully authenticated.')
+                    connection.unbind()
+                    connect(ip, e)
+                else:
+                    messagebox.showerror(message='Incorrect username or password.')
+                    close(root, t)
+                    showAuthenticate()
+                    connection.unbind()
+            except LDAPException as er:
+                messagebox.showerror(message='Cannot contact server: Server timeout.')
+                username.set('')
+                password.set('')
         t = Toplevel(root)
         t.resizable(False, False)
         t.protocol('WM_DELETE_WINDOW', lambda: [close(root, t), username.set(''), password.set('')])
@@ -923,164 +926,6 @@ try:
 
 
         '''
-        ==========================================
-
-        Tab to be used for updating existing
-        entries
-
-        ==========================================
-        '''
-        updateFrame = ttk.Frame(nb)
-        updateFrame.grid(row=0, column=0)
-        updateFrame.columnconfigure(1, weight=1)
-
-
-        '''
-        ------------------------------------------
-
-        Result tree section 2
-
-        ------------------------------------------
-        '''
-        treeLF2 = ttk.Labelframe(updateFrame, text='Search result')
-        treeLF2.grid(row=0, column=0, rowspan=3, padx=5, pady=5, sticky='news')
-        treeLF2.rowconfigure(0, weight=1)
-        tree2 = ttk.Treeview(treeLF2, show='tree')
-        tree2.grid(row=0, column=0, columnspan=2, pady=(5, 0), sticky='nws')
-        tree2.tag_configure('green', background='#88CC22')
-        tree2.tag_configure('white', background='white')
-        s2 = ttk.Scrollbar(treeLF2, orient=VERTICAL, command=tree2.yview)
-        s2.grid(row=0, column=2, pady=(5, 0), sticky='ns')
-        tree2.configure(yscrollcommand=s2.set)
-        # tree.tag_configure('green',background='#88CC22')
-        # tree.tag_configure('white',background='white')
-        # tree.tag_configure('yellow',background='#CCEE66')
-        b21 = ttk.Button(treeLF2, text='Select', command=lambda: toggleColor(
-            'simple', 1, tree2.selection()))
-        b21.grid(row=2, column=0, sticky='news', padx=5, pady=5)
-        b22 = ttk.Button(treeLF2, text='Deselect',
-                         command=lambda: toggleColor('simple', 0, tree2.selection()))
-        b22.grid(row=2, column=1, sticky='news', padx=5, pady=5)
-        treeLF2.state(['disabled'])
-        for widget in treeLF2.winfo_children():
-            widget.state(['disabled'])
-
-
-        '''
-        ------------------------------------------
-
-        Select entries section
-
-        ------------------------------------------
-        '''
-        selectEntriesLF = ttk.Labelframe(
-            updateFrame, text='Select Entries', width=200, height=50)
-        selectEntriesLF.grid(row=0, column=1, padx=(0, 5), pady=5, sticky='news')
-        selectEntriesLF.columnconfigure(1, weight=1)
-        # b2.bind('<Return>',lambda ev: connect(ip,e))
-        ttk.Label(selectEntriesLF, text='Grade:').grid(
-            row=0, column=0, padx=(50, 5), pady=5, sticky='w')
-        ttk.Label(selectEntriesLF, text='Department:').grid(
-            row=1, column=0, padx=(50, 5), pady=5, sticky='w')
-        ttk.Label(selectEntriesLF, text='Entrance year:').grid(
-            row=2, column=0, padx=(50, 5), pady=5, sticky='w')
-        grade = StringVar()
-        department = StringVar()
-        entranceYear = StringVar()
-        grades = ['all', 'bs', 'ms', 'phd']
-        departments = ['all', 'Physics', 'Mathematics', 'Chemistry', 'Agricultural Engineering',
-                       'Natural Resources', 'Electrical & Computer Eng', 'Industrial Engineering',
-                       'Materials Engineering', 'Mining Engineering', 'Civil Engineering',
-                       'Mechanical Engineering', 'Chemical Engineering', 'Textile Engineering']
-        entranceYears = ['all']
-        grade.set(grades[0])
-        department.set(departments[0])
-        entranceYear.set(entranceYears[0])
-        ttk.Combobox(selectEntriesLF, textvariable=grade, values=grades, state='readonly').grid(
-            row=0, column=1, padx=(5, 50), pady=5, sticky='we')
-        ttk.Combobox(selectEntriesLF, textvariable=department, values=departments,
-                     state='readonly').grid(row=1, column=1, padx=(5, 50), pady=5, sticky='we')
-        ttk.Combobox(selectEntriesLF, textvariable=entranceYear, values=entranceYears).grid(
-            row=2, column=1, padx=(5, 50), pady=5, sticky='we')
-        b2 = ttk.Button(selectEntriesLF, text='Fetch',
-                        command=lambda: fetchFromDB(grade, department, entranceYear))
-        b2.grid(row=3, column=0, columnspan=2, sticky='ew', padx=5, pady=5)
-        selectLabel = ttk.Label(
-            selectEntriesLF, text='You have not fetched any entries.', foreground='red')
-        selectLabel.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
-
-
-        '''
-        ------------------------------------------
-
-        Quota section 2
-
-        ------------------------------------------
-        '''
-        quotaLF2 = ttk.Labelframe(updateFrame, text='Credits', width=200, height=350)
-        quotaLF2.grid(row=2, column=1, padx=(0, 5), pady=5, sticky='news')
-        quotaLF2.columnconfigure(2, weight=1)
-        credit2 = StringVar()
-        maxCredit2 = StringVar()
-        minCredit2 = StringVar()
-        sheetCredit2 = StringVar()
-        sheetMax2 = StringVar()
-        discount2 = StringVar()
-        ttk.Label(quotaLF2, text='rials').grid(
-            row=0, column=2, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='rials').grid(
-            row=1, column=2, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='rials').grid(
-            row=2, column=2, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='sheets').grid(
-            row=3, column=2, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='sheets').grid(
-            row=4, column=2, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='percent').grid(
-            row=5, column=2, padx=5, pady=(5, 10), sticky='w')
-        ttk.Entry(quotaLF2, textvariable=credit2).grid(row=0, column=1, padx=5, pady=5)
-        ttk.Entry(quotaLF2, textvariable=maxCredit2).grid(
-            row=1, column=1, padx=5, pady=5)
-        ttk.Entry(quotaLF2, textvariable=minCredit2).grid(
-            row=2, column=1, padx=5, pady=5)
-        ttk.Entry(quotaLF2, textvariable=sheetCredit2).grid(
-            row=3, column=1, padx=5, pady=5)
-        ttk.Entry(quotaLF2, textvariable=sheetMax2).grid(
-            row=4, column=1, padx=5, pady=5)
-        ttk.Entry(quotaLF2, textvariable=discount2).grid(
-            row=5, column=1, padx=5, pady=(5, 10))
-        ttk.Label(quotaLF2, text='Credit:').grid(
-            row=0, column=0, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='Max permitted credit:').grid(
-            row=1, column=0, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='Min permitted credit:').grid(
-            row=2, column=0, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='Sheet credit:').grid(
-            row=3, column=0, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='Max permitted sheet credit:').grid(
-            row=4, column=0, padx=5, pady=5, sticky='w')
-        ttk.Label(quotaLF2, text='Discount:').grid(
-            row=5, column=0, padx=5, pady=(5, 10), sticky='w')
-        quotaLF2.state(['disabled'])
-        for widget in quotaLF2.winfo_children():
-            widget.state(['disabled'])
-
-
-        '''
-        ------------------------------------------
-
-        Update database button
-
-        ------------------------------------------
-        '''
-        updateB = ttk.Button(
-            updateFrame, text='Update selected entries', command=updateDB)
-        updateB.grid(row=3, column=1, sticky='news', padx=(0, 5), pady=(0, 5))
-        updateB.state(['disabled'])
-        # addB.bind('<Return>',addToDB)
-
-
-        '''
         ------------------------------------------
 
         Adding frames to notebook
@@ -1088,7 +933,7 @@ try:
         ------------------------------------------
         '''
         nb.add(addNewFrame, text=' Add new users ')
-        nb.add(updateFrame, text=' Update existing users ')
+        # nb.add(updateFrame, text=' Update existing users ')
 
 
         '''
