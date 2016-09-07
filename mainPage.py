@@ -822,6 +822,12 @@ try:
         sheetCredit = StringVar()
         sheetMax = StringVar()
         discount = StringVar()
+        credit.set(0)
+        maxCredit.set(1000000)
+        minCredit.set(0)
+        sheetCredit.set(0)
+        sheetMax.set(1000)
+        discount.set(0)
         ttk.Label(quotaLF, text='rials').grid(
             row=0, column=2, padx=5, pady=5, sticky='w')
         ttk.Label(quotaLF, text='rials').grid(
