@@ -385,7 +385,7 @@ def addToDB():
     if selection:
         i = 0
         j = 0
-        conn = pypyodbc.win_connect_mdb('XLDB.mdb')
+        conn = pypyodbc.win_connect_mdb('./XLDB.mdb')
         cur = conn.cursor()
         mp = {
             'B.Sc': 'bs',
@@ -406,13 +406,13 @@ def addToDB():
                     usersDictionary[item['text']]['givenName'][0], # firstname
                     usersDictionary[item['text']]['sn'][0], # lastname
                     dep, # department
-                    vars().get("mp[usersDictionary[item['text']]['dn'].split(',')[2][3:]]", ''), # grade
+                    mp[usersDictionary[item['text']]['dn'].split(',')[2][3:]], # grade
                     int(discount.get()), # discount
                     int(sheetCredit.get()), # paper_credit
                     int(credit.get()), # credit
                     int(minCredit.get()), # min_credit
                     True, # enabled
-                    vars().get("int('13' + usersDictionary[item['text']]['cn'][0][:2])", 0), # entrance_year
+                    int('13' + usersDictionary[item['text']]['cn'][0][:2]), # entrance_year
                     str(usersDictionary[item['text']]['cn'][0]), # username
                     datetime.now(), # add_date
                     int(maxCredit.get()), # max_credit
@@ -493,7 +493,7 @@ on entry values
 
 def fetchFromDB(grade, department, entranceYear):
     try:
-        conn = pypyodbc.win_connect_mdb('XLDB.mdb')
+        conn = pypyodbc.win_connect_mdb('./XLDB.mdb')
         cur = conn.cursor()
         query = 'SELECT * FROM credits'
         needsAnd = False
@@ -574,7 +574,7 @@ def updateDB():
                     student_number='%s';
                 ''' % (credit2.get(), maxCredit2.get(), minCredit2.get(), sheetCredit2.get(),
                     sheetMax2.get(), discount2.get(), usersStdnums[item])
-                conn = pypyodbc.win_connect_mdb('XLDB.mdb')
+                conn = pypyodbc.win_connect_mdb('./XLDB.mdb')
                 cur = conn.cursor()
                 cur.execute(query)
                 cur.commit()
