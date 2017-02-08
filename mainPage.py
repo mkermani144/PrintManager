@@ -529,9 +529,8 @@ def fetchFromDB(grade, department, entranceYear):
             selectLabel.configure(
                 text='Successfully fetched data from database.', foreground='green')
             for row in data:
-                tree2.insert('', 0, text=str(row[
-                             0]) + ' ' + str(row[1]), iid=str(row[0]) + ' ' + str(row[1]), tag='green')
-                usersStdnums[str(row[0]) + ' ' + str(row[1])] = str(row[15])
+                tree2.insert('', 0, text=str(row[15]), iid=str(row[15]), tag='green')
+                usersStdnums[str(row[15])] = str(row[15])
             quotaLF2.state(['!disabled'])
             for widget in quotaLF2.winfo_children():
                 widget.state(['!disabled'])
@@ -582,7 +581,6 @@ def updateDB():
                     int(discount2.get()),
                     usersStdnums[item]
                 ]
-                print(usersStdnums[item], type(usersStdnums[item]))
                 query = '''
                     UPDATE Users
                     SET
