@@ -528,9 +528,9 @@ def fetchFromDB(grade, department, entranceYear):
             selectLabel.configure(
                 text='Successfully fetched data from database.', foreground='green')
             for row in data:
-                tree2.insert('', 0, text=row[
-                             0] + ' ' + row[1], iid=row[0] + ' ' + row[1], tag='green')
-                usersStdnums[row[0] + ' ' + row[1]] = row[3]
+                tree2.insert('', 0, text=str(row[
+                             0]) + ' ' + str(row[1]), iid=str(row[0]) + ' ' + str(row[1]), tag='green')
+                usersStdnums[str(row[0]) + ' ' + str(row[1])] = str(row[3])
             quotaLF2.state(['!disabled'])
             for widget in quotaLF2.winfo_children():
                 widget.state(['!disabled'])
