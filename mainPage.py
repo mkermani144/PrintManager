@@ -1009,10 +1009,7 @@ try:
         department = StringVar()
         entranceYear = StringVar()
         grades = ['all', 'bs', 'ms', 'phd']
-        departments = ['all', 'Physics', 'Mathematics', 'Chemistry', 'Agricultural Engineering',
-                       'Natural Resources', 'Electrical & Computer Eng', 'Industrial Engineering',
-                       'Materials Engineering', 'Mining Engineering', 'Civil Engineering',
-                       'Mechanical Engineering', 'Chemical Engineering', 'Textile Engineering']
+        departments = ['all']
         entranceYears = ['all']
         grade.set(grades[0])
         department.set(departments[0])
