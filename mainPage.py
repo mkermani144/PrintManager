@@ -495,24 +495,30 @@ def fetchFromDB(grade, department, entranceYear):
     try:
         conn = pypyodbc.win_connect_mdb('./XLDB.mdb')
         cur = conn.cursor()
-        query = 'SELECT * FROM credits'
+        query = 'SELECT * FROM Users'
         needsAnd = False
+        vals = []
         if grade.get() != 'all' or department.get() != 'all' or entranceYear.get() != 'all':
             query += ' WHERE'
         if grade.get() != 'all':
             needsAnd = True
-            query += " grade='%s'" % grade.get()
+            query += " Grade=?"
+            vals.append[int(grade.get())]
         if department.get() != 'all':
             if needsAnd:
-                query += " AND department='%s'" % department.get()
+                query += " AND Department=?"
+                vals.append[department.get()]
             else:
-                query += " department='%s'" % department.get()
+                query += " Department=?"
+                vals.append[department.get()]
             needsAnd = True
         if entranceYear.get() != 'all':
             if needsAnd:
-                query += " AND entrance_year='%s'" % entranceYear.get()
+                query += " AND EntranceYear=?"
+                vals.append[int(entranceYear.get())]
             else:
-                query += " entrance_year='%s'" % entranceYear.get()
+                query += " EntranceYear=?"
+                vals.append[int(entranceYear.get())]
         query += ';'
         global usersStdnums
         usersStdnums = {}
@@ -561,22 +567,30 @@ def updateDB():
             'green') if not tree2.get_children(x)]
         if selectionIIDs:
             for item in selectionIIDs:
+                val = [
+                    int(credit2.get()),
+                    int(maxCredit2.get()),
+                    int(minCredit2.get()),
+                    int(sheetCredit2.get()),
+                    int(sheetMax2.get()),
+                    int(discount2.get()),
+                    usersStdnums[item]
+                ]
                 query = '''
-                    UPDATE credits
+                    UPDATE Users
                     SET
-                    credit='%s',
-                    max_credit='%s',
-                    min_credit='%s',
-                    paper_credit='%s',
-                    paper_max_credit='%s',
-                    discount='%s'
+                    Credit=?,
+                    maxCredit=?,
+                    minCredit=?,
+                    paperCredit=?,
+                    maxPaperCredit=?,
+                    Discount=?
                     WHERE
-                    student_number='%s';
-                ''' % (credit2.get(), maxCredit2.get(), minCredit2.get(), sheetCredit2.get(),
-                    sheetMax2.get(), discount2.get(), usersStdnums[item])
+                    student_number=?;
+                '''
                 conn = pypyodbc.win_connect_mdb('./XLDB.mdb')
                 cur = conn.cursor()
-                cur.execute(query)
+                cur.execute(query, val)
                 cur.commit()
                 cur.close()
                 conn.close()
