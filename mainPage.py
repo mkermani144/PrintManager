@@ -503,26 +503,27 @@ def fetchFromDB(grade, department, entranceYear):
         if grade.get() != 'all':
             needsAnd = True
             query += " Grade=?"
-            vals.append[int(grade.get())]
+            vals.append(grade.get())
         if department.get() != 'all':
             if needsAnd:
                 query += " AND Department=?"
-                vals.append[department.get()]
+                vals.append(department.get())
             else:
                 query += " Department=?"
-                vals.append[department.get()]
+                vals.append(department.get())
             needsAnd = True
         if entranceYear.get() != 'all':
             if needsAnd:
                 query += " AND EntranceYear=?"
-                vals.append[int(entranceYear.get())]
+                vals.append(int(entranceYear.get()))
             else:
                 query += " EntranceYear=?"
-                vals.append[int(entranceYear.get())]
+                vals.append(int(entranceYear.get()))
+        print(query)
         query += ';'
         global usersStdnums
         usersStdnums = {}
-        cur.execute(query)
+        cur.execute(query, vals)
         data = cur.fetchall().copy()
         if data:
             selectLabel.configure(
@@ -530,7 +531,8 @@ def fetchFromDB(grade, department, entranceYear):
             for row in data:
                 tree2.insert('', 0, text=str(row[
                              0]) + ' ' + str(row[1]), iid=str(row[0]) + ' ' + str(row[1]), tag='green')
-                usersStdnums[str(row[0]) + ' ' + str(row[1])] = str(row[3])
+                usersStdnums[str(row[0]) + ' ' + str(row[1])] = str(row[15])
+                print(usersStdnums)
             quotaLF2.state(['!disabled'])
             for widget in quotaLF2.winfo_children():
                 widget.state(['!disabled'])
@@ -541,6 +543,8 @@ def fetchFromDB(grade, department, entranceYear):
         else:
             messagebox.showinfo(title='No result',
                                 message='The database returned no result.')
+        cur.close()
+        conn.close()
     except RuntimeError as er:
         pass
 
@@ -566,6 +570,8 @@ def updateDB():
         selectionIIDs = [x for x in tree2.tag_has(
             'green') if not tree2.get_children(x)]
         if selectionIIDs:
+            conn = pypyodbc.win_connect_mdb('./XLDB.mdb')
+            cur = conn.cursor()
             for item in selectionIIDs:
                 val = [
                     int(credit2.get()),
@@ -576,6 +582,7 @@ def updateDB():
                     int(discount2.get()),
                     usersStdnums[item]
                 ]
+                print(usersStdnums[item], type(usersStdnums[item]))
                 query = '''
                     UPDATE Users
                     SET
@@ -586,16 +593,14 @@ def updateDB():
                     maxPaperCredit=?,
                     Discount=?
                     WHERE
-                    student_number=?;
+                    userName=?;
                 '''
-                conn = pypyodbc.win_connect_mdb('./XLDB.mdb')
-                cur = conn.cursor()
                 cur.execute(query, val)
                 cur.commit()
-                cur.close()
-                conn.close()
-                messagebox.showinfo(title='Successful operation',
-                                    message='All of the selected entries updated.')
+            messagebox.showinfo(title='Successful operation',
+                                message='All of the selected entries updated.')
+            cur.close()
+            conn.close()
         else:
             messagebox.showinfo(title='Empty selection',
                                 message='No one of the entries selected. Please select at least one.')
