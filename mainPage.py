@@ -495,6 +495,7 @@ def fetchFromDB(grade, department, entranceYear):
     try:
         conn = pypyodbc.win_connect_mdb('./XLDB.mdb')
         cur = conn.cursor()
+        tree2.delete(*tree2.get_children())
         query = 'SELECT * FROM Users'
         needsAnd = False
         vals = []
@@ -519,7 +520,6 @@ def fetchFromDB(grade, department, entranceYear):
             else:
                 query += " EntranceYear=?"
                 vals.append(int(entranceYear.get()))
-        print(query)
         query += ';'
         global usersStdnums
         usersStdnums = {}
@@ -532,7 +532,6 @@ def fetchFromDB(grade, department, entranceYear):
                 tree2.insert('', 0, text=str(row[
                              0]) + ' ' + str(row[1]), iid=str(row[0]) + ' ' + str(row[1]), tag='green')
                 usersStdnums[str(row[0]) + ' ' + str(row[1])] = str(row[15])
-                print(usersStdnums)
             quotaLF2.state(['!disabled'])
             for widget in quotaLF2.winfo_children():
                 widget.state(['!disabled'])
@@ -545,8 +544,9 @@ def fetchFromDB(grade, department, entranceYear):
                                 message='The database returned no result.')
         cur.close()
         conn.close()
-    except RuntimeError as er:
-        pass
+    except Exception as er:
+        messagebox.showinfo(title='No result',
+                                message='The database returned no result.')
 
 
 '''
