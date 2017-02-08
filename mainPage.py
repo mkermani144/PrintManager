@@ -930,6 +930,154 @@ try:
                         Copyright 2016, IUT.'
         ))
 
+        '''
+        ==========================================
+        Tab to be used for updating existing
+        entries
+        ==========================================
+        '''
+        updateFrame = ttk.Frame(nb)
+        updateFrame.grid(row=0, column=0)
+        updateFrame.columnconfigure(1, weight=1)
+
+
+        '''
+        ------------------------------------------
+        Result tree section 2
+        ------------------------------------------
+        '''
+        treeLF2 = ttk.Labelframe(updateFrame, text='Search result')
+        treeLF2.grid(row=0, column=0, rowspan=3, padx=5, pady=5, sticky='news')
+        treeLF2.rowconfigure(0, weight=1)
+        tree2 = ttk.Treeview(treeLF2, show='tree')
+        tree2.grid(row=0, column=0, columnspan=2, pady=(5, 0), sticky='nws')
+        tree2.tag_configure('green', background='#88CC22')
+        tree2.tag_configure('white', background='white')
+        s2 = ttk.Scrollbar(treeLF2, orient=VERTICAL, command=tree2.yview)
+        s2.grid(row=0, column=2, pady=(5, 0), sticky='ns')
+        tree2.configure(yscrollcommand=s2.set)
+        # tree.tag_configure('green',background='#88CC22')
+        # tree.tag_configure('white',background='white')
+        # tree.tag_configure('yellow',background='#CCEE66')
+        b21 = ttk.Button(treeLF2, text='Select', command=lambda: toggleColor(
+            'simple', 1, tree2.selection()))
+        b21.grid(row=2, column=0, sticky='news', padx=5, pady=5)
+        b22 = ttk.Button(treeLF2, text='Deselect',
+                         command=lambda: toggleColor('simple', 0, tree2.selection()))
+        b22.grid(row=2, column=1, sticky='news', padx=5, pady=5)
+        treeLF2.state(['disabled'])
+        for widget in treeLF2.winfo_children():
+            widget.state(['disabled'])
+
+
+        '''
+        ------------------------------------------
+        Select entries section
+        ------------------------------------------
+        '''
+        selectEntriesLF = ttk.Labelframe(
+            updateFrame, text='Select Entries', width=200, height=50)
+        selectEntriesLF.grid(row=0, column=1, padx=(0, 5), pady=5, sticky='news')
+        selectEntriesLF.columnconfigure(1, weight=1)
+        # b2.bind('<Return>',lambda ev: connect(ip,e))
+        ttk.Label(selectEntriesLF, text='Grade:').grid(
+            row=0, column=0, padx=(50, 5), pady=5, sticky='w')
+        ttk.Label(selectEntriesLF, text='Department:').grid(
+            row=1, column=0, padx=(50, 5), pady=5, sticky='w')
+        ttk.Label(selectEntriesLF, text='Entrance year:').grid(
+            row=2, column=0, padx=(50, 5), pady=5, sticky='w')
+        grade = StringVar()
+        department = StringVar()
+        entranceYear = StringVar()
+        grades = ['all', 'bs', 'ms', 'phd']
+        departments = ['all', 'Physics', 'Mathematics', 'Chemistry', 'Agricultural Engineering',
+                       'Natural Resources', 'Electrical & Computer Eng', 'Industrial Engineering',
+                       'Materials Engineering', 'Mining Engineering', 'Civil Engineering',
+                       'Mechanical Engineering', 'Chemical Engineering', 'Textile Engineering']
+        entranceYears = ['all']
+        grade.set(grades[0])
+        department.set(departments[0])
+        entranceYear.set(entranceYears[0])
+        ttk.Combobox(selectEntriesLF, textvariable=grade, values=grades, state='readonly').grid(
+            row=0, column=1, padx=(5, 50), pady=5, sticky='we')
+        ttk.Combobox(selectEntriesLF, textvariable=department, values=departments,
+                     state='readonly').grid(row=1, column=1, padx=(5, 50), pady=5, sticky='we')
+        ttk.Combobox(selectEntriesLF, textvariable=entranceYear, values=entranceYears).grid(
+            row=2, column=1, padx=(5, 50), pady=5, sticky='we')
+        b2 = ttk.Button(selectEntriesLF, text='Fetch',
+                        command=lambda: fetchFromDB(grade, department, entranceYear))
+        b2.grid(row=3, column=0, columnspan=2, sticky='ew', padx=5, pady=5)
+        selectLabel = ttk.Label(
+            selectEntriesLF, text='You have not fetched any entries.', foreground='red')
+        selectLabel.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
+
+
+        '''
+        ------------------------------------------
+        Quota section 2
+        ------------------------------------------
+        '''
+        quotaLF2 = ttk.Labelframe(updateFrame, text='Credits', width=200, height=350)
+        quotaLF2.grid(row=2, column=1, padx=(0, 5), pady=5, sticky='news')
+        quotaLF2.columnconfigure(2, weight=1)
+        credit2 = StringVar()
+        maxCredit2 = StringVar()
+        minCredit2 = StringVar()
+        sheetCredit2 = StringVar()
+        sheetMax2 = StringVar()
+        discount2 = StringVar()
+        ttk.Label(quotaLF2, text='rials').grid(
+            row=0, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='rials').grid(
+            row=1, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='rials').grid(
+            row=2, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='sheets').grid(
+            row=3, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='sheets').grid(
+            row=4, column=2, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='percent').grid(
+            row=5, column=2, padx=5, pady=(5, 10), sticky='w')
+        ttk.Entry(quotaLF2, textvariable=credit2).grid(row=0, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=maxCredit2).grid(
+            row=1, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=minCredit2).grid(
+            row=2, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=sheetCredit2).grid(
+            row=3, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=sheetMax2).grid(
+            row=4, column=1, padx=5, pady=5)
+        ttk.Entry(quotaLF2, textvariable=discount2).grid(
+            row=5, column=1, padx=5, pady=(5, 10))
+        ttk.Label(quotaLF2, text='Credit:').grid(
+            row=0, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Max permitted credit:').grid(
+            row=1, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Min permitted credit:').grid(
+            row=2, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Sheet credit:').grid(
+            row=3, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Max permitted sheet credit:').grid(
+            row=4, column=0, padx=5, pady=5, sticky='w')
+        ttk.Label(quotaLF2, text='Discount:').grid(
+            row=5, column=0, padx=5, pady=(5, 10), sticky='w')
+        quotaLF2.state(['disabled'])
+        for widget in quotaLF2.winfo_children():
+            widget.state(['disabled'])
+
+
+        '''
+        ------------------------------------------
+        Update database button
+        ------------------------------------------
+        '''
+        updateB = ttk.Button(
+            updateFrame, text='Update selected entries', command=updateDB)
+        updateB.grid(row=3, column=1, sticky='news', padx=(0, 5), pady=(0, 5))
+        updateB.state(['disabled'])
+        # addB.bind('<Return>',addToDB)
+
+
 
         '''
         ------------------------------------------
@@ -939,7 +1087,7 @@ try:
         ------------------------------------------
         '''
         nb.add(addNewFrame, text=' Add new users ')
-        # nb.add(updateFrame, text=' Update existing users ')
+        nb.add(updateFrame, text=' Update existing users ')
 
 
         '''
