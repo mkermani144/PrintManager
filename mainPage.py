@@ -561,8 +561,10 @@ entries
 
 
 def updateDB():
-    if not (credit2.get().isdigit() and maxCredit2.get().isdigit() and minCredit2.get().isdigit()
-            and sheetCredit2.get().isdigit() and sheetMax2.get().isdigit() and discount2.get().isdigit()):
+    try:
+        a = int(credit2.get()) + int(maxCredit2.get()) + int(minCredit2.get())
+        + int(sheetCredit2.get()) + int(sheetMax2.get()) + int(discount2.get())
+    except:
         messagebox.showerror(title='Invalid input',
                              message='Some of the entries of credits section are not valid.')
     else:
@@ -584,12 +586,12 @@ def updateDB():
                 query = '''
                     UPDATE Users
                     SET
-                    Credit=?,
-                    maxCredit=?,
-                    minCredit=?,
-                    paperCredit=?,
-                    maxPaperCredit=?,
-                    Discount=?
+                    Credit=Credit + ?,
+                    maxCredit=maxCredit + ?,
+                    minCredit=minCredit + ?,
+                    paperCredit=paperCredit + ?,
+                    maxPaperCredit=maxPaperCredit + ?,
+                    Discount=Discount + ?
                     WHERE
                     userName=?;
                 '''
